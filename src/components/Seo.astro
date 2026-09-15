@@ -1,0 +1,51 @@
+---
+import { Font } from 'astro:assets';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Extra JSON-LD to merge into the page, e.g. Article or FAQ schema. */
+  schema?: Record<string, unknown> | Record<string, unknown>[];
+  noindex?: boolean;
+}
+
+const { title, description, schema, noindex = false } = Astro.props;
+
+const SITE_NAME = 'हिंदी व्याकरण';
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const fullTitle = Astro.url.pathname === '/' ? title : `${title} — ${SITE_NAME}`;
+
+const schemas = schema ? (Array.isArray(schema) ? schema : [schema]) : [];
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex, follow" />}
+
+{/* The site is Hindi throughout; declaring it lets browsers pick correct
+    Devanagari shaping, hyphenation and speech synthesis voices. */}
+<meta property="og:locale" content="hi_IN" />
+<meta property="og:site_name" content={SITE_NAME} />
+<meta property="og:type" content="website" />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta name="twitter:card" content="summary" />
+
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="sitemap" href="/sitemap-index.xml" />
+
+{/* Only the sans face is preloaded. The serif is used for headings that
+    sit below the fold on most pages, so preloading both would compete
+    for bandwidth on exactly the slow connections this site targets. */}
+<Font cssVariable="--font-devanagari-sans" preload />
+<Font cssVariable="--font-devanagari-serif" />
+
+{
+  schemas.map((entry) => (
+    <script type="application/ld+json" set:html={JSON.stringify(entry)} is:inline />
+  ))
+}

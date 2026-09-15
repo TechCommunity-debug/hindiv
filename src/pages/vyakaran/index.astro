@@ -1,0 +1,73 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import TopicCard from '../../components/TopicCard.astro';
+import { categories, plannedTopics } from '../../lib/taxonomy';
+import { getAllTopics, categoryUrl } from '../../lib/content';
+
+const topics = await getAllTopics();
+---
+
+<BaseLayout
+  title="विषय-सूची"
+  description="हिंदी व्याकरण के सभी विषय — वर्ण विचार, शब्द विचार, वाक्य विचार, शब्द भंडार, अलंकार और रचना। सात खंडों में व्यवस्थित।"
+>
+  <div class="mx-auto max-w-6xl px-4 py-8 md:py-12">
+    <Breadcrumbs items={[{ label: 'व्याकरण' }]} />
+
+    <header class="mt-5 max-w-2xl">
+      <h1 class="text-h1 font-bold text-ink md:text-display">विषय-सूची</h1>
+      <p class="mt-4 text-lead text-body">
+        पूरा हिंदी व्याकरण सात खंडों में — ध्वनि से शब्द, शब्द से वाक्य, और वाक्य से रचना तक।
+      </p>
+    </header>
+
+    <div class="mt-12 flex flex-col gap-14">
+      {
+        categories.map((category) => {
+          const written = topics.filter((topic) => topic.data.category === category.id);
+          const planned = plannedTopics.filter((topic) => topic.category === category.id);
+
+          return (
+            <section aria-labelledby={`khand-${category.id}`} data-khand={category.id}>
+              <div class="flex flex-wrap items-center gap-x-3 gap-y-1 border-b-2 border-(--khand) pb-3">
+                <span class="khand-marker shrink-0" aria-hidden="true">
+                  {category.marker}
+                </span>
+                <h2 id={`khand-${category.id}`} class="m-0 text-h2 font-semibold text-ink">
+                  <a href={categoryUrl(category.id)} class="no-underline hover:underline">
+                    {category.title}
+                  </a>
+                </h2>
+                <span class="text-meta text-faint latin">{category.titleEn}</span>
+              </div>
+
+              <p class="mt-3 max-w-2xl text-ui text-body">{category.summary}</p>
+
+              {written.length > 0 && (
+                <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {written.map((topic) => (
+                    <TopicCard topic={topic} />
+                  ))}
+                </div>
+              )}
+
+              {planned.length > 0 && (
+                <div class="mt-5">
+                  <p class="eyebrow text-(--khand) opacity-70">शीघ्र आ रहे हैं</p>
+                  <ul class="mt-2 flex flex-wrap gap-2 p-0">
+                    {planned.map((topic) => (
+                      <li class="list-none rounded-control border border-dashed border-hairline px-2.5 py-1 text-meta text-faint">
+                        {topic.title}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </section>
+          );
+        })
+      }
+    </div>
+  </div>
+</BaseLayout>

@@ -1,0 +1,39 @@
+---
+/**
+ * उदाहरण — examples.
+ *
+ * Ochre is used here and nowhere else on the site, echoing the red ink
+ * that marked headings and citations in manuscript Devanagari. Because
+ * it appears in exactly one role, a reader learns within two pages that
+ * ochre means "example" and can skim for it.
+ *
+ * `items` renders a compact chip row for word lists; the slot handles
+ * full sentences, where chips would break the reading line.
+ */
+interface Props {
+  items?: string[];
+  label?: string;
+}
+
+const { items, label = 'उदाहरण' } = Astro.props;
+---
+
+<div class="my-5 border-l-2 border-ochre/40 bg-ochre-soft py-3 pl-4 pr-3 md:pl-5">
+  <p class="eyebrow text-ochre">{label}</p>
+
+  {
+    items && items.length > 0 && (
+      <ul class="mt-2 flex list-none flex-wrap gap-x-2 gap-y-1.5 p-0">
+        {items.map((item) => (
+          <li class="rounded-control border border-ochre/20 bg-surface px-2.5 py-1 text-ui text-ink">
+            {item}
+          </li>
+        ))}
+      </ul>
+    )
+  }
+
+  <div class="mt-2 text-body text-ink empty:hidden [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+    <slot />
+  </div>
+</div>

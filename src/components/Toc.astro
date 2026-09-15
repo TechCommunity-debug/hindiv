@@ -1,0 +1,90 @@
+---
+import type { MarkdownHeading } from 'astro';
+
+/**
+ * इस पृष्ठ में — on-page table of contents.
+ *
+ * Only h2 and h3 are listed. Grammar pages are long (संज्ञा alone runs to
+ * five भेद, each with examples), and the competitor offers no way to jump
+ * within a page at all — you scroll or you leave.
+ */
+interface Props {
+  headings: MarkdownHeading[];
+}
+
+const { headings } = Astro.props;
+const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+{
+  items.length > 1 && (
+    <nav aria-labelledby="toc-heading" data-toc>
+      <p id="toc-heading" class="eyebrow">
+        इस पृष्ठ में
+      </p>
+      <ul class="mt-3 flex flex-col gap-0.5 border-l border-hairline p-0">
+        {items.map((heading) => (
+          <li class="list-none">
+            <a
+              href={`#${heading.slug}`}
+              data-toc-link
+              class:list={[
+                '-ml-px block border-l border-transparent py-1 text-meta leading-snug text-mute no-underline transition-colors hover:text-ink',
+                heading.depth === 2 ? 'pl-3' : 'pl-6',
+              ]}
+            >
+              {heading.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+<script>
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')];
+  if (links.length > 0) {
+    // The TOC is rendered twice on wide pages — once inline for narrow
+    // viewports, once in the sticky rail — so ids map to a LIST of links,
+    // not a single one. Keying by id alone would leave the inline copy
+    // permanently unhighlighted.
+    const byId = new Map<string, HTMLAnchorElement[]>();
+    for (const link of links) {
+      const id = decodeURIComponent(link.hash.slice(1));
+      const group = byId.get(id);
+      if (group) group.push(link);
+      else byId.set(id, [link]);
+    }
+
+    const targets = [...byId.keys()]
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => Boolean(el));
+
+    const setActive = (id: string) => {
+      for (const [key, group] of byId) {
+        const on = key === id;
+        for (const link of group) {
+          link.classList.toggle('border-accent', on);
+          link.classList.toggle('text-ink', on);
+          link.classList.toggle('text-mute', !on);
+        }
+      }
+    };
+
+    // Top-anchored band: a heading counts as "current" once it reaches
+    // the upper quarter of the viewport, which matches where a reader's
+    // eye actually sits.
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible[0]?.target.id) setActive(visible[0].target.id);
+      },
+      { rootMargin: '-80px 0px -70% 0px', threshold: 0 },
+    );
+
+    targets.forEach((target) => observer.observe(target));
+  }
+</script>

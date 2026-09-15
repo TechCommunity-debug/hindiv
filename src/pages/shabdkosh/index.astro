@@ -1,0 +1,92 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import SearchTrigger from '../../components/SearchTrigger.astro';
+import { categories } from '../../lib/taxonomy';
+import { getTermsByCategory } from '../../lib/content';
+
+/**
+ * शब्दकोश — the glossary.
+ *
+ * Its whole reason for existing: a reader who only needs to know what
+ * "अनुस्वार" or "विभक्ति" means should get one line, not a 2,000-word
+ * chapter. Every entry links onward to the topic that explains it fully,
+ * so the glossary works as an index into the site rather than a dead end.
+ */
+const grouped = await getTermsByCategory();
+const total = [...grouped.values()].reduce((sum, list) => sum + list.length, 0);
+---
+
+<BaseLayout
+  title="व्याकरण शब्दकोश"
+  description={`हिंदी व्याकरण के ${total} पारिभाषिक शब्दों के संक्षिप्त अर्थ — अनुस्वार, विभक्ति, संधि, कारक और अन्य। एक पंक्ति में उत्तर।`}
+>
+  <div class="mx-auto max-w-4xl px-4 py-8 md:py-12">
+    <Breadcrumbs items={[{ label: 'शब्दकोश' }]} />
+
+    <header class="mt-5">
+      <h1 class="text-h1 font-bold text-ink md:text-display">व्याकरण शब्दकोश</h1>
+      <p class="mt-4 max-w-2xl text-lead text-body">
+        पारिभाषिक शब्दों के संक्षिप्त अर्थ। पूरा विवरण चाहिए तो शब्द के आगे दिए विषय पर जाएँ।
+      </p>
+      <div class="mt-6">
+        <SearchTrigger class="w-full py-3 text-ui sm:w-80" />
+      </div>
+    </header>
+
+    <div class="mt-12 flex flex-col gap-12">
+      {
+        categories.map((category) => {
+          const terms = grouped.get(category.id) ?? [];
+          if (terms.length === 0) return null;
+
+          return (
+            <section aria-labelledby={`terms-${category.id}`} data-khand={category.id}>
+              <h2
+                id={`terms-${category.id}`}
+                class="m-0 flex flex-wrap items-center gap-x-3 gap-y-1 border-b-2 border-(--khand) pb-3 text-h2 font-semibold text-ink"
+              >
+                <span class="khand-marker shrink-0" aria-hidden="true">
+                  {category.marker}
+                </span>
+                {category.title}
+              </h2>
+
+              <dl class="mt-2 flex flex-col p-0">
+                {terms.map((term) => (
+                  <div
+                    id={term.id}
+                    class="scroll-mt-24 border-b border-hairline-soft py-4 sm:grid sm:grid-cols-[12rem_minmax(0,1fr)] sm:gap-6"
+                  >
+                    <dt class="font-serif text-h3 font-semibold text-ink">
+                      {term.data.term}
+                      <span class="mt-0.5 block text-meta font-normal text-faint latin">
+                        {term.data.termEn}
+                      </span>
+                    </dt>
+                    <dd class="m-0 mt-1.5 text-ui text-body sm:mt-0">
+                      {term.data.meaning}
+                      {term.data.example && (
+                        <span class="mt-1.5 block text-meta text-ochre">
+                          उदाहरण: {term.data.example}
+                        </span>
+                      )}
+                      {term.data.seeAlso && (
+                        <a
+                          href={`/vyakaran/${term.data.category}/${term.data.seeAlso}/`}
+                          class="mt-1.5 block text-meta font-medium text-(--khand) no-underline hover:underline"
+                        >
+                          विस्तार से पढ़ें →
+                        </a>
+                      )}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          );
+        })
+      }
+    </div>
+  </div>
+</BaseLayout>

@@ -1,0 +1,47 @@
+---
+/**
+ * Light/dark toggle.
+ *
+ * The stylesheet keys dark mode off an explicit `data-theme="dark"`
+ * attribute rather than the media query alone, so that a reader's choice
+ * can override their OS. The inline script in BaseLayout resolves the
+ * system preference into that attribute before first paint.
+ */
+---
+
+<button
+  type="button"
+  data-theme-toggle
+  class="rounded-control border border-hairline p-2 text-body transition-colors hover:text-ink"
+  aria-label="रंग-रूप बदलें"
+>
+  <svg class="size-4 dark:hidden" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+    <path
+      d="M16 11.2A6.2 6.2 0 0 1 8.8 4a6.5 6.5 0 1 0 7.2 7.2Z"
+      stroke="currentColor"
+      stroke-width="1.5"
+      stroke-linejoin="round"></path>
+  </svg>
+  <svg class="hidden size-4 dark:block" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+    <circle cx="10" cy="10" r="3.5" stroke="currentColor" stroke-width="1.5"></circle>
+    <path
+      d="M10 2v1.5M10 16.5V18M18 10h-1.5M3.5 10H2m12.2-4.2-1 1m-6.4 6.4-1 1m8.4 0-1-1m-6.4-6.4-1-1"
+      stroke="currentColor"
+      stroke-width="1.5"
+      stroke-linecap="round"></path>
+  </svg>
+</button>
+
+<script>
+  document.querySelector('[data-theme-toggle]')?.addEventListener('click', () => {
+    const root = document.documentElement;
+    const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = next;
+    try {
+      localStorage.setItem('theme', next);
+    } catch {
+      // Private browsing or blocked storage — the choice simply will not
+      // survive the next page load, which is an acceptable degradation.
+    }
+  });
+</script>

@@ -1,0 +1,595 @@
+/*
+  source("../") scopes class detection to src/ only.
+
+  Without it Tailwind's automatic detection walks the whole repository,
+  including the 199-file Tailwind documentation snapshot under
+  .agents/skills/. Those files name essentially every utility the
+  framework has, so the generated stylesheet came out at 356 KB instead
+  of roughly 25 KB — on the slow mobile connections this site is built
+  for, that alone would have been the difference between a fast page and
+  a sluggish one.
+*/
+@import 'tailwindcss' source('../');
+
+/*
+  हिंदी व्याकरण — design tokens
+  ------------------------------------------------------------------
+  Derived from DESIGN.md (Vercel / Geist), with three deliberate
+  departures required by a Devanagari reading surface:
+
+  1. Type family. Geist Sans/Mono carry no Devanagari glyphs, so the
+     Noto Devanagari superfamily replaces them. Geist Mono's role as a
+     section "eyebrow" is taken over by small, wide-tracked Latin caps —
+     Devanagari must never be tracked out (see 3).
+  2. Reading size. Geist sets body at 14px. Devanagari carries matras
+     above and below the shirorekha, so body starts at 17px with a 1.9
+     line-height; anything tighter collides vertically.
+  3. Tracking. Geist's signature negative letter-spacing (-2.4px at
+     display size) is applied to LATIN ONLY. Negative tracking on
+     Devanagari breaks the shirorekha join and mangles conjuncts.
+
+  Kept faithfully from Geist: the ink-on-near-white restraint, the grey
+  text ladder, 1px hairline borders before any shadow, flat depth, the
+  4px spacing base, and the bimodal radius scale. The hero mesh gradient
+  is dropped entirely — it is the single loudest "AI template" signal
+  and this is a reference work, not a launch page.
+*/
+
+/*
+  COLOR SYSTEM
+  ------------------------------------------------------------------
+  Raw values live on :root and flip under [data-theme='dark']; they are
+  exposed to Tailwind through `@theme inline` further down. That is the
+  documented v4 pattern for colors that reference other variables, and it
+  means every utility (text-ink, bg-canvas, border-hairline) follows the
+  theme automatically without a `dark:` prefix on every element.
+
+  DESIGN.md confines colour to a hero mesh gradient and keeps everything
+  else monochrome. That works for a marketing page with six sections; it
+  does not work for a reference work with seven sections and eventually
+  seventy topics, where a reader needs to know at a glance which part of
+  the grammar they are standing in.
+
+  So the accent family DESIGN.md names — link blue, cyan, violet,
+  magenta, warning amber — is kept, but reassigned from decoration to
+  navigation: each खंड gets one identity colour, deepened to stay legible
+  as text on white. Colour here is a wayfinding system, not a flourish,
+  which is exactly why it does not read as a generated template. Printed
+  encyclopaedias have coded volumes by colour for a century.
+*/
+
+:root {
+  /* — Ink ladder (Geist's four tiers, warmed a half-step) ---------- */
+  --ink: #17171a;
+  --body: #4c4c54;
+  --mute: #7e7e88;
+  --faint: #a09aa6;
+
+  /* — Surfaces. Warmed off pure grey: a faint paper tone is easier on
+       the eye for long Devanagari reading than clinical #fafafa. ----- */
+  --canvas: #fbfaf8;
+  --surface: #ffffff;
+  --sunken: #f5f3ef;
+  --hairline: #e7e4dd;
+  --hairline-soft: #f0ede7;
+
+  /* — Accent. DESIGN.md's link-deep (#0761d1), used for links, focus
+       and active nav. Never as a large fill. ------------------------ */
+  --accent: #0761d1;
+  --accent-deep: #054a9f;
+  --accent-soft: #e9f1fd;
+
+  /* — खंड identity colours. One per section, spanning the wheel so no
+       two are confusable, each ≥4.5:1 on white so they can carry text
+       and not just decoration. -------------------------------------- */
+  --khand-bhasha-vyakaran: #1d4ed8; /* blue    — DESIGN link family   */
+  --khand-varn-vichar: #0f766e; /* teal    — DESIGN cyan family   */
+  --khand-shabd-vichar: #6d28d9; /* violet  — DESIGN violet        */
+  --khand-vakya-vichar: #a21caf; /* plum    — DESIGN magenta       */
+  --khand-shabd-bhandar: #8f5a06; /* ochre   — DESIGN warning       */
+  --khand-kavya-alankar: #be123c; /* rose    — DESIGN pink family   */
+  --khand-rachna: #166534; /* green   — completes the wheel  */
+
+  --khand-bhasha-vyakaran-soft: #eef3ff;
+  --khand-varn-vichar-soft: #e8f7f4;
+  --khand-shabd-vichar-soft: #f3eeff;
+  --khand-vakya-vichar-soft: #fbeefc;
+  --khand-shabd-bhandar-soft: #fdf4e6;
+  --khand-kavya-alankar-soft: #fdeef2;
+  --khand-rachna-soft: #ecf7f0;
+
+  /* — Ochre: उदाहरण markers, echoing the red ink that marked headings
+       in manuscript Devanagari. ------------------------------------- */
+  --ochre: #8f5a06;
+  --ochre-soft: #fdf4e6;
+
+  /* — Semantic ----------------------------------------------------- */
+  --correct: #166534;
+  --correct-soft: #ecf7f0;
+  --caution: #8f5a06;
+  --caution-soft: #fdf4e6;
+}
+
+[data-theme='dark'] {
+  --ink: #f2f2f0;
+  --body: #b8b6be;
+  --mute: #8d8a95;
+  --faint: #6d6a75;
+
+  --canvas: #101012;
+  --surface: #18181b;
+  --sunken: #1f1f23;
+  --hairline: #2c2c32;
+  --hairline-soft: #232328;
+
+  --accent: #7db3f8;
+  --accent-deep: #a8cdfb;
+  --accent-soft: #0f1c2e;
+
+  /* Lightened so they sit on a dark canvas at the same perceived
+     emphasis, rather than being mechanically inverted. */
+  --khand-bhasha-vyakaran: #93b4fb;
+  --khand-varn-vichar: #5ecfc0;
+  --khand-shabd-vichar: #bda3f7;
+  --khand-vakya-vichar: #e9a2f0;
+  --khand-shabd-bhandar: #e0b062;
+  --khand-kavya-alankar: #f4a0b4;
+  --khand-rachna: #74d19a;
+
+  --khand-bhasha-vyakaran-soft: #14203a;
+  --khand-varn-vichar-soft: #0d2422;
+  --khand-shabd-vichar-soft: #1e1830;
+  --khand-vakya-vichar-soft: #2a1130;
+  --khand-shabd-bhandar-soft: #2a2110;
+  --khand-kavya-alankar-soft: #2e1219;
+  --khand-rachna-soft: #10261a;
+
+  --ochre: #e0b062;
+  --ochre-soft: #2a2110;
+
+  --correct: #74d19a;
+  --correct-soft: #10261a;
+  --caution: #e0b062;
+  --caution-soft: #2a2110;
+}
+
+/*
+  Any element carrying data-khand="<id>" publishes that खंड's colour to
+  its subtree as --khand / --khand-soft. Descendants then use Tailwind's
+  CSS-variable syntax — text-(--khand), border-(--khand), bg-(--khand-soft)
+  — which keeps the markup static and scannable. Building class names like
+  `text-khand-${id}` would not work: Tailwind reads source files as plain
+  text and never sees a concatenated class.
+*/
+[data-khand='bhasha-vyakaran'] {
+  --khand: var(--khand-bhasha-vyakaran);
+  --khand-soft: var(--khand-bhasha-vyakaran-soft);
+}
+[data-khand='varn-vichar'] {
+  --khand: var(--khand-varn-vichar);
+  --khand-soft: var(--khand-varn-vichar-soft);
+}
+[data-khand='shabd-vichar'] {
+  --khand: var(--khand-shabd-vichar);
+  --khand-soft: var(--khand-shabd-vichar-soft);
+}
+[data-khand='vakya-vichar'] {
+  --khand: var(--khand-vakya-vichar);
+  --khand-soft: var(--khand-vakya-vichar-soft);
+}
+[data-khand='shabd-bhandar'] {
+  --khand: var(--khand-shabd-bhandar);
+  --khand-soft: var(--khand-shabd-bhandar-soft);
+}
+[data-khand='kavya-alankar'] {
+  --khand: var(--khand-kavya-alankar);
+  --khand-soft: var(--khand-kavya-alankar-soft);
+}
+[data-khand='rachna'] {
+  --khand: var(--khand-rachna);
+  --khand-soft: var(--khand-rachna-soft);
+}
+
+/* Depth of treatment, published the same way as खंड colour. Three tiers,
+   three tints, so the badge reads at a glance without being loud. */
+[data-level='aadhar'] {
+  --level: var(--correct);
+  --level-soft: var(--correct-soft);
+}
+[data-level='madhyam'] {
+  --level: var(--accent);
+  --level-soft: var(--accent-soft);
+}
+[data-level='unnat'] {
+  --level: var(--khand-kavya-alankar);
+  --level-soft: var(--khand-kavya-alankar-soft);
+}
+
+@theme inline {
+  /* — Ink ladder --------------------------------------------------- */
+  --color-ink: var(--ink);
+  --color-body: var(--body);
+  --color-mute: var(--mute);
+  --color-faint: var(--faint);
+
+  /* — Surfaces ----------------------------------------------------- */
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-sunken: var(--sunken);
+  --color-hairline: var(--hairline);
+  --color-hairline-soft: var(--hairline-soft);
+
+  /* — Accent ------------------------------------------------------- */
+  --color-accent: var(--accent);
+  --color-accent-deep: var(--accent-deep);
+  --color-accent-soft: var(--accent-soft);
+
+  /* — खंड colours, for the few places a section is named statically
+       (the spectrum rule, the khand grid). --------------------------- */
+  --color-khand-bhasha-vyakaran: var(--khand-bhasha-vyakaran);
+  --color-khand-varn-vichar: var(--khand-varn-vichar);
+  --color-khand-shabd-vichar: var(--khand-shabd-vichar);
+  --color-khand-vakya-vichar: var(--khand-vakya-vichar);
+  --color-khand-shabd-bhandar: var(--khand-shabd-bhandar);
+  --color-khand-kavya-alankar: var(--khand-kavya-alankar);
+  --color-khand-rachna: var(--khand-rachna);
+
+  /* — Accents and semantics ---------------------------------------- */
+  --color-ochre: var(--ochre);
+  --color-ochre-soft: var(--ochre-soft);
+  --color-correct: var(--correct);
+  --color-correct-soft: var(--correct-soft);
+  --color-caution: var(--caution);
+  --color-caution-soft: var(--caution-soft);
+}
+
+@theme {
+  /* — Type families ------------------------------------------------ */
+  --font-sans: var(--font-devanagari-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-devanagari-serif), ui-serif, Georgia, serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* — Radius: bimodal, per Geist. Controls square, content rounded,
+       calls-to-action pilled. --------------------------------------- */
+  --radius-control: 6px;
+  --radius-card: 12px;
+  --radius-panel: 16px;
+  --radius-pill: 100px;
+
+  /* — Type scale. Sized for Devanagari, not Latin. ------------------ */
+  --text-eyebrow: 0.6875rem; /* 11px — Latin caps only */
+  --text-eyebrow--line-height: 1rem;
+  --text-eyebrow--letter-spacing: 0.08em;
+
+  --text-meta: 0.8125rem; /* 13px */
+  --text-meta--line-height: 1.25rem;
+
+  --text-ui: 0.9375rem; /* 15px */
+  --text-ui--line-height: 1.5rem;
+
+  --text-body: 1.0625rem; /* 17px */
+  --text-body--line-height: 1.9;
+
+  --text-lead: 1.1875rem; /* 19px */
+  --text-lead--line-height: 1.8;
+
+  --text-h3: 1.25rem; /* 20px */
+  --text-h3--line-height: 1.6;
+
+  --text-h2: 1.5rem; /* 24px */
+  --text-h2--line-height: 1.5;
+
+  --text-h1: 2rem; /* 32px */
+  --text-h1--line-height: 1.35;
+
+  --text-display: 2.5rem; /* 40px */
+  --text-display--line-height: 1.3;
+
+  /* — Depth: hairline first, whisper shadow second, nothing heavier. */
+  --shadow-whisper: 0 1px 1px rgb(0 0 0 / 0.04);
+  --shadow-float: 0 2px 2px rgb(0 0 0 / 0.03), 0 8px 16px -4px rgb(0 0 0 / 0.08);
+}
+
+/* Dark mode. Readers use this at night; the token set flips, the design
+   does not. The raw values live in the [data-theme='dark'] block at the
+   top of this file, beside their light counterparts, so a colour and its
+   dark partner are never edited apart. */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+@layer base {
+  html {
+    background-color: var(--color-canvas);
+    /* Devanagari conjuncts and matras need the full shaping table. */
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+    scroll-padding-top: 5.5rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-body);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.9;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Headings carry the serif. Devanagari gets NO negative tracking. */
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-serif);
+    color: var(--color-ink);
+    font-weight: 600;
+    letter-spacing: normal;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background-color: var(--color-accent-soft);
+    color: var(--color-ink);
+  }
+
+  /* Latin-only utility: the one place tracking goes negative, matching
+     Geist's display treatment without touching Devanagari. */
+  .latin {
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: -0.02em;
+  }
+}
+
+@utility eyebrow {
+  font-size: var(--text-eyebrow);
+  line-height: var(--text-eyebrow--line-height);
+  letter-spacing: var(--text-eyebrow--letter-spacing);
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--color-mute);
+}
+
+/* Hairline-bordered surface — the structural workhorse, per Geist. */
+@utility card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-card);
+}
+
+/*
+  The seven-खंड spectrum rule.
+
+  This is the site's one decorative device, and it takes the place of
+  DESIGN.md's hero mesh gradient. It carries the same idea — a multi-stop
+  band of the brand accent family — but each stop is a real section of
+  the grammar in reading order, not an arbitrary blend. Hard stops rather
+  than a blur: a gradient would say "tech startup", seven discrete bands
+  say "seven volumes", which is what this is.
+*/
+@utility spectrum-rule {
+  height: 3px;
+  background: linear-gradient(
+    to right,
+    var(--khand-bhasha-vyakaran) 0 14.28%,
+    var(--khand-varn-vichar) 14.28% 28.57%,
+    var(--khand-shabd-vichar) 28.57% 42.85%,
+    var(--khand-vakya-vichar) 42.85% 57.14%,
+    var(--khand-shabd-bhandar) 57.14% 71.42%,
+    var(--khand-kavya-alankar) 71.42% 85.71%,
+    var(--khand-rachna) 85.71% 100%
+  );
+}
+
+/* The numeral that marks a खंड — I through VII — in its own colour. */
+@utility khand-marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  height: 1.75rem;
+  padding-inline: 0.375rem;
+  border-radius: var(--radius-control);
+  background-color: var(--khand-soft, var(--color-sunken));
+  color: var(--khand, var(--color-mute));
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
+  font-weight: 600;
+  line-height: 1;
+}
+
+/*
+  Reading surface for rendered Markdown.
+  Hand-written rather than @tailwindcss/typography because that plugin's
+  rhythm is tuned for 16px Latin; every vertical value here had to be
+  opened up for Devanagari matras, and its prose-* overrides would have
+  been longer than the rules themselves.
+*/
+@utility prose-hi {
+  color: var(--color-body);
+  font-size: var(--text-body);
+  line-height: 1.9;
+
+  & > *:first-child {
+    margin-top: 0;
+  }
+  & > *:last-child {
+    margin-bottom: 0;
+  }
+
+  & p {
+    margin-block: 1.1em;
+  }
+
+  /*
+    Section headings sit on a hairline with a short bar of the खंड's own
+    colour riding on top of it. It is a small thing, but it is what keeps
+    a long topic page from reading as an undifferentiated grey column,
+    and it ties the page back to the section colour the reader clicked in
+    from.
+  */
+  & h2 {
+    position: relative;
+    font-size: var(--text-h2);
+    line-height: 1.5;
+    font-weight: 600;
+    margin-top: 2.4em;
+    margin-bottom: 0.6em;
+    padding-bottom: 0.35em;
+    border-bottom: 1px solid var(--color-hairline);
+    scroll-margin-top: 6rem;
+  }
+
+  & h2::after {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0;
+    bottom: -1px;
+    width: 2.5rem;
+    height: 2px;
+    background-color: var(--khand, var(--color-accent));
+    border-radius: 2px;
+  }
+
+  & h3 {
+    font-size: var(--text-h3);
+    line-height: 1.6;
+    font-weight: 600;
+    margin-top: 1.9em;
+    margin-bottom: 0.5em;
+    scroll-margin-top: 6rem;
+  }
+
+  & h4 {
+    font-size: var(--text-body);
+    font-weight: 600;
+    color: var(--color-ink);
+    margin-top: 1.6em;
+    margin-bottom: 0.4em;
+    scroll-margin-top: 6rem;
+  }
+
+  & a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+    text-decoration-color: color-mix(in oklab, var(--color-accent) 35%, transparent);
+  }
+  & a:hover {
+    text-decoration-color: currentColor;
+  }
+
+  & strong {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+
+  & ul,
+  & ol {
+    margin-block: 1.1em;
+    padding-inline-start: 1.5em;
+  }
+  & ul {
+    list-style: disc;
+  }
+  & ol {
+    list-style: decimal;
+  }
+  & li {
+    margin-block: 0.4em;
+    padding-inline-start: 0.25em;
+  }
+  & li::marker {
+    color: var(--color-faint);
+  }
+
+  /* Nested component slots bring their own lists; don't re-indent them. */
+  & :is(aside, section, div) > ul:first-child {
+    margin-top: 0;
+  }
+
+  /*
+    Tables carry a lot of weight in Hindi grammar — verb conjugations,
+    kaarak markers, sandhi transformations. On phones they scroll
+    horizontally inside their own wrapper rather than squeezing columns
+    until the Devanagari wraps mid-word.
+  */
+  & table {
+    display: block;
+    /* max-content + min-width:100% is the pair that makes a table stretch
+       to fill when it fits and scroll inside itself when it doesn't. */
+    width: max-content;
+    min-width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    margin-block: 1.5em;
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-card);
+    /* `collapse` would suppress the border radius. */
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: var(--text-ui);
+    line-height: 1.7;
+  }
+
+  /* Tinted with the खंड colour rather than plain grey — grammar tables
+     are dense, and a hint of colour on the header row makes the column
+     boundaries findable when the table scrolls sideways on a phone. */
+  & thead {
+    background-color: var(--khand-soft, var(--color-sunken));
+  }
+
+  & th {
+    text-align: start;
+    font-weight: 600;
+    color: var(--color-ink);
+    padding: 0.7em 1em;
+    white-space: nowrap;
+    border-bottom: 1px solid
+      color-mix(in oklab, var(--khand, var(--color-hairline)) 25%, transparent);
+  }
+
+  & td {
+    padding: 0.7em 1em;
+    border-bottom: 1px solid var(--color-hairline-soft);
+    vertical-align: top;
+  }
+
+  & tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  & blockquote {
+    margin-block: 1.4em;
+    padding-inline-start: 1.1em;
+    border-inline-start: 2px solid var(--khand, var(--color-hairline));
+    color: var(--color-mute);
+  }
+
+  & hr {
+    margin-block: 2.5em;
+    border: 0;
+    border-top: 1px solid var(--color-hairline);
+  }
+
+  & code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background-color: var(--color-sunken);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+    color: var(--color-ink);
+  }
+}

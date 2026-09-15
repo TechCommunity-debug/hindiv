@@ -1,0 +1,64 @@
+---
+import { categories } from '../lib/taxonomy';
+import { getAllTopics, topicUrl, categoryUrl } from '../lib/content';
+
+/**
+ * The full contents tree, shown beside every topic page on desktop.
+ *
+ * Keeping the whole work visible while reading one page is what makes a
+ * reference site feel like a book rather than a pile of articles — you
+ * always know where you are and what surrounds you.
+ */
+interface Props {
+  currentSlug?: string;
+}
+
+const { currentSlug } = Astro.props;
+const topics = await getAllTopics();
+---
+
+<nav aria-label="विषय-सूची" class="text-ui">
+  {
+    categories.map((category) => {
+      const items = topics.filter((topic) => topic.data.category === category.id);
+      if (items.length === 0) return null;
+
+      return (
+        <div class="mb-6" data-khand={category.id}>
+          <a
+            href={categoryUrl(category.id)}
+            class="flex items-center gap-2.5 no-underline"
+            aria-label={`${category.title} खंड`}
+          >
+            <span class="khand-marker shrink-0" aria-hidden="true">
+              {category.marker}
+            </span>
+            <span class="eyebrow text-(--khand)">{category.title}</span>
+          </a>
+
+          <ul class="mt-2 ml-3.5 flex flex-col gap-0.5 border-l border-hairline p-0">
+            {items.map((topic) => {
+              const current = topic.id === currentSlug;
+              return (
+                <li class="list-none">
+                  <a
+                    href={topicUrl(topic)}
+                    aria-current={current ? 'page' : undefined}
+                    class:list={[
+                      '-ml-px block border-l py-1 pl-3 no-underline transition-colors',
+                      current
+                        ? 'border-(--khand) bg-(--khand-soft) font-semibold text-ink'
+                        : 'border-transparent text-body hover:border-(--khand) hover:text-ink',
+                    ]}
+                  >
+                    {topic.data.title}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      );
+    })
+  }
+</nav>

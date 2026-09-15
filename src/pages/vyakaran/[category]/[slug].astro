@@ -1,0 +1,147 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import Sidebar from '../../../components/Sidebar.astro';
+import Toc from '../../../components/Toc.astro';
+import PrevNext from '../../../components/PrevNext.astro';
+import RelatedTopics from '../../../components/RelatedTopics.astro';
+import Paribhasha from '../../../components/content/Paribhasha.astro';
+import Udaharan from '../../../components/content/Udaharan.astro';
+import Dhyan from '../../../components/content/Dhyan.astro';
+import Abhyas from '../../../components/content/Abhyas.astro';
+import Prashn from '../../../components/content/Prashn.astro';
+import { getAllTopics, getNeighbours, getRelated, categoryUrl } from '../../../lib/content';
+import { getCategory, levels } from '../../../lib/taxonomy';
+
+export async function getStaticPaths() {
+  const topics = await getAllTopics();
+  return topics.map((topic) => ({
+    params: { category: topic.data.category, slug: topic.id },
+    props: { topic },
+  }));
+}
+
+const { topic } = Astro.props;
+const { title, titleEn, summary, definition, level, category, updated } = topic.data;
+
+const { Content, headings } = await render(topic);
+const khand = getCategory(category);
+const { prev, next } = await getNeighbours(topic);
+const related = await getRelated(topic);
+
+const updatedIso = updated.toISOString();
+const updatedHi = updated.toLocaleDateString('hi-IN', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+/**
+ * Article + Breadcrumb structured data. Worth the markup: "संज्ञा किसे
+ * कहते हैं" is an enormous Hindi search query, and a DefinedTerm answer
+ * is exactly what Google wants to surface for it.
+ */
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: `${title} — परिभाषा, भेद और उदाहरण`,
+    description: summary,
+    inLanguage: 'hi',
+    dateModified: updatedIso,
+    articleSection: khand?.title,
+    mainEntityOfPage: new URL(Astro.url.pathname, Astro.site).href,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'मुख्य पृष्ठ', item: new URL('/', Astro.site).href },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: khand?.title ?? category,
+        item: new URL(categoryUrl(category), Astro.site).href,
+      },
+      { '@type': 'ListItem', position: 3, name: title },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title={`${title} — परिभाषा, भेद और उदाहरण`}
+  description={summary}
+  schema={schema}
+>
+  {/* data-khand here is what gives the prose its section colour — the h2
+      rules, table headers and blockquotes all read --khand from it. */}
+  <div class="mx-auto max-w-6xl px-4 py-8 md:py-12" data-khand={category}>
+    <div class="lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-10 xl:grid-cols-[16rem_minmax(0,1fr)_13rem] xl:gap-12">
+      {/* Contents tree — desktop only; mobile readers get the header menu. */}
+      <aside class="hidden lg:block">
+        <div class="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto pb-8">
+          <Sidebar currentSlug={topic.id} />
+        </div>
+      </aside>
+
+      <article class="min-w-0">
+        <Breadcrumbs
+          items={[
+            { label: 'व्याकरण', href: '/vyakaran/' },
+            { label: khand?.title ?? category, href: categoryUrl(category) },
+            { label: title },
+          ]}
+        />
+
+        <header class="mt-5">
+          <p class="eyebrow text-(--khand)">{khand?.title}</p>
+          <h1 class="mt-2 text-h1 font-bold text-ink md:text-display">{title}</h1>
+          <p class="mt-1 text-ui text-faint latin">{titleEn}</p>
+          <div class="mt-4 h-0.5 w-16 rounded-full bg-(--khand)" aria-hidden="true"></div>
+          <p class="mt-4 text-lead text-body">{summary}</p>
+
+          <div class="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 border-y border-hairline py-3 text-meta text-mute">
+            <span
+              data-level={level}
+              class="rounded-pill bg-(--level-soft) px-2 py-0.5 font-medium text-(--level)"
+              >{levels[level].label}</span
+            >
+            <span>{levels[level].hint}</span>
+            <span class="text-faint" aria-hidden="true">·</span>
+            <span>अंतिम बदलाव <time datetime={updatedIso}>{updatedHi}</time></span>
+          </div>
+        </header>
+
+        {/* On-page contents, inline on mobile/tablet where the rail is hidden. */}
+        <details class="mt-6 rounded-card border border-hairline bg-surface p-4 xl:hidden">
+          <summary class="cursor-pointer text-ui font-semibold text-ink">इस पृष्ठ में</summary>
+          <div class="mt-3">
+            <Toc headings={headings} />
+          </div>
+        </details>
+
+        <div class="prose-hi mt-8">
+          <Paribhasha>
+            <p>{definition}</p>
+          </Paribhasha>
+
+          {/* Components are passed in rather than imported per-file, so
+              content authors write <Udaharan> without an import header. */}
+          <Content components={{ Paribhasha, Udaharan, Dhyan, Abhyas, Prashn }} />
+        </div>
+
+        <RelatedTopics topics={related} />
+        <PrevNext prev={prev} next={next} />
+      </article>
+
+      {/* Reading rail — only where there is genuinely room for it. */}
+      <aside class="hidden xl:block">
+        <div class="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto pb-8">
+          <Toc headings={headings} />
+        </div>
+      </aside>
+    </div>
+  </div>
+</BaseLayout>

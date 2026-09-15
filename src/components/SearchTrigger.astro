@@ -1,0 +1,30 @@
+---
+/**
+ * The input-shaped button that opens search on desktop. It is only a
+ * trigger — the dialog lives in the layout (see SearchDialog.astro).
+ */
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+
+<button
+  type="button"
+  data-search-open
+  class:list={[
+    'flex items-center gap-2 rounded-control border border-hairline bg-surface px-3 py-2 text-left text-meta text-mute transition-colors hover:border-mute',
+    className,
+  ]}
+  aria-label="खोजें"
+>
+  <svg class="size-4 shrink-0" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+    <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.5"></circle>
+    <path d="m13.5 13.5 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+  </svg>
+  <span class="grow">खोजें…</span>
+  <kbd
+    class="hidden shrink-0 rounded border border-hairline px-1.5 py-0.5 font-mono text-[11px] text-faint lg:block"
+    >Ctrl K</kbd
+  >
+</button>

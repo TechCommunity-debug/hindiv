@@ -1,0 +1,21 @@
+---
+/**
+ * ध्यान दें — a caution about an exception, a confusable pair, or the
+ * place where readers reliably go wrong. Deliberately visually quiet: if
+ * every aside shouts, none of them is read.
+ */
+interface Props {
+  label?: string;
+}
+
+const { label = 'ध्यान दें' } = Astro.props;
+---
+
+<aside
+  class="my-5 rounded-card border border-caution/25 bg-caution-soft px-4 py-3 md:px-5"
+>
+  <p class="eyebrow text-caution">{label}</p>
+  <div class="mt-1.5 text-ui text-body [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+    <slot />
+  </div>
+</aside>

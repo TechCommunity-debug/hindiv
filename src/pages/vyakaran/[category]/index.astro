@@ -1,0 +1,66 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import TopicCard from '../../../components/TopicCard.astro';
+import { categories, plannedTopics, type Category } from '../../../lib/taxonomy';
+import { getTopicsByCategory } from '../../../lib/content';
+
+export async function getStaticPaths() {
+  return categories.map((category) => ({
+    params: { category: category.id },
+    props: { category },
+  }));
+}
+
+const { category } = Astro.props as { category: Category };
+const topics = await getTopicsByCategory(category.id);
+const planned = plannedTopics.filter((topic) => topic.category === category.id);
+---
+
+<BaseLayout title={category.title} description={category.summary}>
+  <div class="mx-auto max-w-6xl px-4 py-8 md:py-12" data-khand={category.id}>
+    <Breadcrumbs
+      items={[{ label: 'व्याकरण', href: '/vyakaran/' }, { label: category.title }]}
+    />
+
+    <header class="mt-5 max-w-2xl">
+      <div class="flex items-center gap-2.5">
+        <span class="khand-marker shrink-0" aria-hidden="true">{category.marker}</span>
+        <p class="eyebrow text-(--khand)">खंड {category.marker}</p>
+      </div>
+      <h1 class="mt-3 text-h1 font-bold text-ink md:text-display">{category.title}</h1>
+      <p class="mt-1 text-ui text-faint latin">{category.titleEn}</p>
+      <div class="mt-4 h-0.5 w-16 rounded-full bg-(--khand)" aria-hidden="true"></div>
+      <p class="mt-4 text-lead text-body">{category.summary}</p>
+    </header>
+
+    {
+      topics.length > 0 ? (
+        <div class="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {topics.map((topic) => (
+            <TopicCard topic={topic} />
+          ))}
+        </div>
+      ) : (
+        <p class="mt-10 rounded-card border border-dashed border-hairline p-6 text-ui text-mute">
+          इस खंड के विषय अभी तैयार किए जा रहे हैं।
+        </p>
+      )
+    }
+
+    {
+      planned.length > 0 && (
+        <section class="mt-12 border-t border-hairline pt-6">
+          <p class="eyebrow">इस खंड में शीघ्र आ रहे हैं</p>
+          <ul class="mt-3 flex flex-wrap gap-2 p-0">
+            {planned.map((topic) => (
+              <li class="list-none rounded-control border border-dashed border-hairline px-3 py-1.5 text-ui text-faint">
+                {topic.title}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+  </div>
+</BaseLayout>

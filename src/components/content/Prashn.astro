@@ -1,0 +1,38 @@
+---
+/**
+ * One practice question with a reveal-on-demand answer.
+ * Used inside <Abhyas>.
+ */
+interface Props {
+  q: string;
+  a: string;
+}
+
+const { q, a } = Astro.props;
+---
+
+<li class="list-none">
+  <details class="group rounded-card border border-hairline bg-surface">
+    <summary
+      class="flex cursor-pointer list-none items-start gap-3 px-4 py-3 text-ui text-ink marker:content-none [&::-webkit-details-marker]:hidden"
+    >
+      <svg
+        class="mt-1.5 size-3 shrink-0 text-mute transition-transform group-open:rotate-90"
+        viewBox="0 0 12 12"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path
+          d="m4 2 4 4-4 4"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"></path>
+      </svg>
+      <span class="grow">{q}</span>
+    </summary>
+    <p class="border-t border-hairline-soft bg-correct-soft px-4 py-3 pl-10 text-ui text-body">
+      <span class="eyebrow mr-2 text-correct">उत्तर</span>{a}
+    </p>
+  </details>
+</li>

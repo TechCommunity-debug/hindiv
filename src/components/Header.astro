@@ -1,0 +1,129 @@
+---
+import SearchTrigger from './SearchTrigger.astro';
+import ThemeToggle from './ThemeToggle.astro';
+import { categories } from '../lib/taxonomy';
+
+const path = Astro.url.pathname;
+const isActive = (href: string) => path === href || path.startsWith(href);
+
+const nav = [
+  { href: '/vyakaran/', label: 'व्याकरण' },
+  { href: '/shabdkosh/', label: 'शब्दकोश' },
+  { href: '/parichay/', label: 'परिचय' },
+];
+---
+
+<header
+  class="sticky top-0 z-40 border-b border-hairline bg-canvas/85 backdrop-blur-md"
+  style="padding-top: env(safe-area-inset-top, 0px)"
+>
+  <div class="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4 md:h-16">
+    <a
+      href="/"
+      class="flex shrink-0 items-baseline gap-2 no-underline"
+      aria-label="हिंदी व्याकरण — मुख्य पृष्ठ"
+    >
+      <span class="font-serif text-h3 font-bold tracking-normal text-ink">हिंदी व्याकरण</span>
+    </a>
+
+    <nav class="ml-4 hidden items-center gap-1 md:flex" aria-label="मुख्य">
+      {
+        nav.map((item) => (
+          <a
+            href={item.href}
+            class:list={[
+              'rounded-control px-3 py-1.5 text-ui no-underline transition-colors',
+              isActive(item.href) ? 'bg-sunken text-ink' : 'text-body hover:text-ink',
+            ]}
+            aria-current={isActive(item.href) ? 'page' : undefined}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="ml-auto flex items-center gap-2">
+      <SearchTrigger class="hidden w-56 md:flex lg:w-64" />
+
+      <button
+        type="button"
+        data-search-open
+        class="rounded-control border border-hairline p-2 text-body md:hidden"
+        aria-label="खोजें"
+      >
+        <svg class="size-4" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.5"></circle>
+          <path d="m13.5 13.5 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+          ></path>
+        </svg>
+      </button>
+
+      <ThemeToggle />
+
+      <button
+        type="button"
+        data-menu-toggle
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        class="rounded-control border border-hairline p-2 text-body md:hidden"
+        aria-label="मेन्यू"
+      >
+        <svg class="size-4" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path
+            d="M3 6h14M3 10h14M3 14h14"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div id="mobile-menu" hidden class="border-t border-hairline bg-surface md:hidden">
+    <nav class="mx-auto max-w-6xl px-4 py-3" aria-label="मुख्य (मोबाइल)">
+      <ul class="flex flex-col gap-0.5">
+        {
+          nav.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class="block rounded-control px-3 py-2.5 text-ui text-body no-underline hover:bg-sunken"
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <p class="eyebrow mt-4 px-3">खंड</p>
+      <ul class="mt-1 flex flex-col gap-0.5">
+        {
+          categories.map((category) => (
+            <li data-khand={category.id}>
+              <a
+                href={`/vyakaran/${category.id}/`}
+                class="flex items-center gap-3 rounded-control px-3 py-2 no-underline hover:bg-(--khand-soft)"
+              >
+                <span class="khand-marker shrink-0">{category.marker}</span>
+                <span class="text-ui text-body">{category.title}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+  const menu = document.getElementById('mobile-menu');
+
+  toggle?.addEventListener('click', () => {
+    const open = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!open));
+    if (menu) menu.hidden = open;
+  });
+</script>

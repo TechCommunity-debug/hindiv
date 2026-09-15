@@ -1,0 +1,18 @@
+---
+/**
+ * अभ्यास — self-check questions at the end of a topic.
+ *
+ * Built on <details>, so it works with JavaScript disabled and is
+ * keyboard- and screen-reader-accessible for free. The answer stays
+ * hidden until asked for: a visible answer is not practice, it is just
+ * more text to skim past.
+ */
+---
+
+<section class="my-8 rounded-panel border border-hairline bg-sunken p-5 md:p-6">
+  <h2 class="m-0 text-h3 font-semibold text-ink">अभ्यास</h2>
+  <p class="mt-1 text-meta text-mute">उत्तर देखने से पहले स्वयं सोचें।</p>
+  <ol class="mt-4 flex list-none flex-col gap-2 p-0">
+    <slot />
+  </ol>
+</section>

@@ -1,0 +1,45 @@
+---
+import { topicUrl, type Topic } from '../lib/content';
+
+interface Props {
+  prev?: Topic;
+  next?: Topic;
+}
+
+const { prev, next } = Astro.props;
+---
+
+{
+  (prev || next) && (
+    <nav
+      aria-label="क्रमिक विषय"
+      class="mt-12 grid gap-3 border-t border-hairline pt-6 sm:grid-cols-2"
+    >
+      {prev ? (
+        <a
+          href={topicUrl(prev)}
+          rel="prev"
+          data-khand={prev.data.category}
+          class="rounded-card border border-hairline bg-surface p-4 no-underline transition-colors hover:border-(--khand) hover:bg-(--khand-soft)"
+        >
+          <span class="eyebrow text-(--khand)">पिछला</span>
+          <span class="mt-1 block font-serif text-h3 font-semibold text-ink">{prev.data.title}</span>
+        </a>
+      ) : (
+        <span />
+      )}
+
+      {next && (
+        <a
+          href={topicUrl(next)}
+          rel="next"
+          data-khand={next.data.category}
+          class="rounded-card border border-hairline bg-surface p-4 text-right no-underline transition-colors hover:border-(--khand) hover:bg-(--khand-soft) sm:col-start-2"
+        >
+          <span class="eyebrow text-(--khand)">अगला</span>
+          <span class="mt-1 block font-serif text-h3 font-semibold text-ink">{next.data.title}</span>
+        </a>
+      )}
+    </nav>
+  )
+}

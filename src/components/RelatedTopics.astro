@@ -1,0 +1,42 @@
+---
+import { topicUrl, type Topic } from '../lib/content';
+
+/**
+ * सम्बंधित विषय — lateral links, curated per topic in frontmatter.
+ *
+ * Hindi grammar concepts are densely interlinked: you cannot really
+ * understand कारक without विभक्ति and संज्ञा, or काल without क्रिया. The
+ * competitor's pages are terminal — once you are on one, the only way
+ * out is the global menu. These links are the difference between a list
+ * of articles and an actual reference work.
+ */
+interface Props {
+  topics: Topic[];
+}
+
+const { topics } = Astro.props;
+---
+
+{
+  topics.length > 0 && (
+    <section class="mt-12 border-t border-hairline pt-6">
+      <h2 class="m-0 text-h3 font-semibold text-ink">सम्बंधित विषय</h2>
+      <ul class="mt-4 grid gap-2 p-0 sm:grid-cols-2">
+        {/* Each card carries its OWN khand colour, not the current page's —
+            a related topic often sits in a different section, and the
+            colour is how a reader sees that before clicking. */}
+        {topics.map((topic) => (
+          <li class="list-none" data-khand={topic.data.category}>
+            <a
+              href={topicUrl(topic)}
+              class="flex h-full flex-col rounded-card border border-hairline border-s-2 border-s-(--khand) bg-surface px-4 py-3 no-underline transition-colors hover:border-(--khand) hover:bg-(--khand-soft)"
+            >
+              <span class="font-serif text-ui font-semibold text-ink">{topic.data.title}</span>
+              <span class="mt-0.5 line-clamp-2 text-meta text-mute">{topic.data.summary}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
