@@ -1,0 +1,8 @@
+{
+  // Use the TypeScript pinned in devDependencies (6.0.3) rather than the
+  // one bundled with the editor. Without this the editor typechecks with a
+  // different compiler than `astro check` and `tsc` do, which shows up as
+  // errors that the build does not have.
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
+}

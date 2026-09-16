@@ -19,9 +19,14 @@ npm run dev      # or: npx astro dev --background
 Background server controls: `astro dev stop`, `astro dev status`, `astro dev logs`.
 
 ```bash
-npm run build    # static output to dist/
+npm run build    # static output to dist/, including the PDFs
 npm run check    # astro check — types and template diagnostics
 ```
+
+`build` runs `astro build` and then `scripts/generate-pdfs.mjs`, which
+needs a Chrome or Chromium on the machine (see **PDFs** below). Use
+`npm run build:no-pdf` on a box without one — the site builds, but every
+download link 404s.
 
 ## How content is organised
 
@@ -184,6 +189,68 @@ a prefix trie — not before.
 Opens with Ctrl/Cmd-K, `/`, or any element carrying `data-search-open`.
 The dialog is rendered once from the layout, never inside a responsive
 wrapper — a `<dialog>` in a `display:none` parent cannot be shown.
+
+## PDFs
+
+"हिंदी व्याकरण PDF" is one of the highest-volume queries in this subject,
+and the competitor answers it with a Drive link. Here it is part of the
+build.
+
+**`/pdf/`** is the page that chases the query. The title and H1 carry the
+phrase verbatim, and the URL carries it by way of the host name —
+`hindivyakaran.net/pdf` says "hindi vyakaran pdf" without repeating a
+word of it. The page lists every topic grouped by khand with a download
+beside each, over one prominent complete-book button.
+
+It is linked from four places: the home page hero, a second copy of the
+complete-book block above the home page footer, the site footer, and a
+row on every topic page. The per-topic rows also chase the long tail
+(`संधि PDF`) and link back, which makes `/pdf/` the best-linked document
+on the site rather than an orphan.
+
+Note that the page and the rendered files **share the `/pdf/`
+directory** — the page builds to `dist/pdf/index.html` and sits beside
+`hindi-vyakaran.pdf` and the per-khand subdirectories. That is fine; a
+directory holds both an index and its files. Don't "fix" it by moving
+the assets.
+
+Each topic page carries **two** download affordances by design: a
+compact tinted chip beside the h1 for the reader who never scrolls, and
+the solid-fill block after the content for the reader who read to the
+end. `CompletePdfCta.astro` and `DownloadIcon.astro` keep the shared
+markup in one place.
+
+Everything is generated **at build time** and served as a static file —
+no function in the request path of a link that exists for readers on slow
+connections:
+
+```
+src/pages/print/**        bare, noindex render of each topic + the whole book
+      ↓  astro build
+dist/pdf-manifest.json    what to render and where to put it
+      ↓  scripts/generate-pdfs.mjs   (serves dist/, drives Chrome)
+dist/pdf/**.pdf           46 files, ~21 MB, ~40s
+```
+
+The renderer uses **`playwright-core` against the system Chrome**, not
+`playwright` — it keeps the dependency at 14 MB and skips a ~150 MB
+browser download per CI run. Point `PDF_CHROME` at the binary if it is
+somewhere unusual.
+
+Three things are easy to break here:
+
+- **`await document.fonts.ready` before `page.pdf()`.** Printing early
+  does not produce an ugly PDF, it produces 250 pages of tofu — and the
+  build still exits 0. Devanagari is shaped by the font, not the renderer.
+- **Never serve the pages as `file://`.** Astro emits root-absolute asset
+  paths; under `file://` they resolve to the filesystem root and the PDFs
+  come out unstyled, in a fallback face.
+- **Heading line-heights are opened up in `PrintLayout`** (1.75/1.85).
+  Devanagari ink overflows the line boxes the heading scale gives it,
+  which is invisible on screen but strands a 2px crescent of a शिरोरेखा
+  at the foot of the *previous* page once Chrome starts fragmenting.
+  Same file undoes `display: block` on tables — that rule exists so
+  tables scroll sideways on phones, and paper does not scroll.
 
 ## Gotchas
 

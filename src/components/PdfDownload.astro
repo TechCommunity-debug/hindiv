@@ -1,0 +1,56 @@
+---
+import DownloadIcon from './DownloadIcon.astro';
+import { pdfUrl, pdfFilename, PDF_LANDING_URL } from '../lib/pdf';
+import type { Topic } from '../lib/content';
+
+/**
+ * The download row on a topic page.
+ *
+ * Two jobs, and the second is the reason it earns its place on every
+ * topic: it gives the reader the one file they came for, and it links
+ * back to /pdf/ from forty pages — which is what makes that landing
+ * page the strongest internally-linked document on the site rather
+ * than an orphan hanging off the footer.
+ *
+ * This is the second download affordance on the page; the first sits
+ * beside the h1 for the reader who never scrolls. They are deliberately
+ * different weights — a compact tinted chip up top, the solid fill
+ * here, where a reader who has read to the end has earned a real offer.
+ *
+ * `download` is what turns the link into a save rather than an in-tab
+ * Chrome PDF viewer, and it renames the file to something meaningful
+ * in a downloads folder full of other people's PDFs.
+ */
+interface Props {
+  topic: Topic;
+}
+
+const { topic } = Astro.props;
+---
+
+<aside
+  class="not-prose mt-10 rounded-panel border border-hairline bg-sunken p-5"
+  aria-labelledby="pdf-download-heading"
+>
+  <h2 id="pdf-download-heading" class="m-0 text-h3 font-semibold text-ink">
+    {topic.data.title} PDF
+  </h2>
+  <p class="mt-1 text-ui text-body">
+    इस विषय की परिभाषा, भेद, उदाहरण और अभ्यास — बिना इंटरनेट पढ़ने और छापने के लिए।
+  </p>
+
+  <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-3">
+    <a
+      href={pdfUrl(topic)}
+      download={pdfFilename(topic)}
+      class="inline-flex items-center gap-2 rounded-control bg-(--khand) px-4 py-2.5 text-ui font-semibold text-canvas no-underline transition-opacity hover:opacity-90"
+    >
+      <DownloadIcon class="size-4" />
+      Download PDF
+    </a>
+
+    <a href={PDF_LANDING_URL} class="text-ui text-accent no-underline hover:underline">
+      सभी विषयों की PDF →
+    </a>
+  </div>
+</aside>

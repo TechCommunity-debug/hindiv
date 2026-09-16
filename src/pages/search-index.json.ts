@@ -47,7 +47,7 @@ export const GET: APIRoute = async () => {
     records.push({
       t: name,
       te: termEn,
-      u: seeAlso ? `/vyakaran/${category}/${seeAlso}/` : `/shabdkosh/#${term.id}`,
+      u: seeAlso ? `/${category}/${seeAlso}/` : `/shabdkosh/#${term.id}`,
       s: meaning,
       c: categoryTitle(category),
       kind: 'term',

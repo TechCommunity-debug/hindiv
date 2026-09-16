@@ -1,0 +1,41 @@
+---
+/**
+ * Served by the host when something on its side fails. The site itself is
+ * static, so nothing here can be rendered on demand — this page is a plain
+ * document the host points its 500 handler at, and it deliberately avoids
+ * search: whatever broke would break the index fetch too.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ErrorPage from '../components/ErrorPage.astro';
+---
+
+<BaseLayout title="सर्वर त्रुटि" description="सर्वर पर कोई समस्या आ गई है।" noindex>
+  <ErrorPage
+    code={500}
+    heading="सर्वर पर कुछ गड़बड़ है"
+    message="गलती आपकी नहीं — हमारे छोर पर कुछ अटक गया है। कुछ क्षण बाद पृष्ठ फिर से खोलें, या नीचे किसी खंड पर जाएँ।"
+    search={false}
+  >
+    <div class="mt-8 flex flex-wrap gap-3">
+      <button
+        type="button"
+        data-reload
+        class="rounded-pill bg-accent px-6 py-3 text-ui font-semibold text-white transition-colors hover:bg-accent-deep"
+      >
+        फिर से कोशिश करें
+      </button>
+      <a
+        href="/"
+        class="rounded-pill border border-hairline bg-surface px-6 py-3 text-ui text-ink no-underline transition-colors hover:bg-sunken"
+      >
+        मुखपृष्ठ
+      </a>
+    </div>
+  </ErrorPage>
+</BaseLayout>
+
+<script>
+  document
+    .querySelector('[data-reload]')
+    ?.addEventListener('click', () => window.location.reload());
+</script>

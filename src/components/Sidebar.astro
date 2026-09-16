@@ -33,7 +33,9 @@ const topics = await getAllTopics();
             <span class="khand-marker shrink-0" aria-hidden="true">
               {category.marker}
             </span>
-            <span class="eyebrow text-(--khand)">{category.title}</span>
+            <span class="eyebrow text-(--khand)">
+              {category.title} <span class="latin italic">({category.titleEn})</span>
+            </span>
           </a>
 
           <ul class="mt-2 ml-3.5 flex flex-col gap-0.5 border-l border-hairline p-0">
@@ -51,7 +53,7 @@ const topics = await getAllTopics();
                         : 'border-transparent text-body hover:border-(--khand) hover:text-ink',
                     ]}
                   >
-                    {topic.data.title}
+                    {topic.data.title} <span class="latin italic">({topic.data.titleEn})</span>
                   </a>
                 </li>
               );

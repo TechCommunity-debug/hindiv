@@ -1,0 +1,24 @@
+---
+/**
+ * The download arrow, shared by every PDF affordance on the site.
+ *
+ * It appears at four different sizes (hero CTA, topic header, topic
+ * footer, per-row chip); `class` carries the size utility so the path
+ * data itself is written once. `currentColor` lets it inherit whatever
+ * the surrounding button is doing — khand colour, accent, or white.
+ */
+interface Props {
+  class?: string;
+}
+
+const { class: className = 'size-4' } = Astro.props;
+---
+
+<svg class:list={['shrink-0', className]} viewBox="0 0 16 16" fill="none" aria-hidden="true">
+  <path
+    d="M8 2v8m0 0L4.5 6.5M8 10l3.5-3.5M2.5 13h11"
+    stroke="currentColor"
+    stroke-width="1.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"></path>
+</svg>

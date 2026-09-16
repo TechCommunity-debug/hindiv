@@ -1,0 +1,60 @@
+---
+/**
+ * The body shared by every error page. The pages themselves differ only in
+ * their code, heading and explanation — the way out (search, then the seven
+ * खंड) is the same one every time, and a reader who has just hit a dead end
+ * should not have to learn a new layout to get back to the material.
+ */
+import SearchTrigger from '../components/SearchTrigger.astro';
+import { categories } from '../lib/taxonomy';
+import { categoryUrl } from '../lib/content';
+
+interface Props {
+  /** Numeric status, shown in the eyebrow: "त्रुटि 404". */
+  code: number;
+  heading: string;
+  /** One or two sentences: what happened, and what to do about it. */
+  message: string;
+  /**
+   * Whether to offer the search box. Off for errors where the failure is the
+   * server's, not the address's — search would only fail the same way.
+   */
+  search?: boolean;
+}
+
+const { code, heading, message, search = true } = Astro.props;
+---
+
+<div class="mx-auto max-w-2xl px-4 py-20 md:py-28">
+  <p class="eyebrow">त्रुटि {code}</p>
+  <h1 class="mt-3 text-h1 font-bold text-ink md:text-display">{heading}</h1>
+  <p class="mt-4 text-lead text-body">{message}</p>
+
+  {
+    search && (
+      <div class="mt-8">
+        <SearchTrigger class="w-full py-3 text-ui sm:w-80" />
+      </div>
+    )
+  }
+
+  <slot />
+
+  <ul class="mt-10 grid gap-2 p-0 sm:grid-cols-2">
+    {
+      categories.map((category) => (
+        <li class="list-none" data-khand={category.id}>
+          <a
+            href={categoryUrl(category.id)}
+            class="flex items-center gap-3 rounded-card border border-hairline border-s-2 border-s-(--khand) bg-surface px-4 py-3 no-underline transition-colors hover:border-(--khand) hover:bg-(--khand-soft)"
+          >
+            <span class="khand-marker shrink-0" aria-hidden="true">
+              {category.marker}
+            </span>
+            <span class="text-ui text-ink">{category.title}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</div>

@@ -1,0 +1,200 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import CompletePdfCta from '../../components/CompletePdfCta.astro';
+import DownloadIcon from '../../components/DownloadIcon.astro';
+import { categories } from '../../lib/taxonomy';
+import { getAllTopics, topicUrl, categoryUrl } from '../../lib/content';
+import { pdfUrl, pdfFilename, COMPLETE_PDF_URL, PDF_LANDING_URL } from '../../lib/pdf';
+
+/**
+ * Hindi Vyakaran PDF — the keyword landing page.
+ *
+ * One page carries this query, and it is this one. The <title>, the H1
+ * and the opening line all say "Hindi Vyakaran PDF" verbatim, because
+ * that is the string people type, and the URL says it too by way of the
+ * host name: hindivyakaran.net/pdf. Spreading the same intent thinly
+ * across forty topic pages would leave every one of them a weak partial
+ * match; the topic pages instead chase their own long-tail ("संधि PDF")
+ * and link back here, which concentrates the signal instead of
+ * splitting it.
+ *
+ * It is also a real page, not a doorway: every topic in the grammar is
+ * listed, grouped by khand, each row linking both to the PDF and to the
+ * topic itself. A reader who wanted the PDF gets it in one click; a
+ * reader who would rather just read gets the page instead.
+ */
+const topics = await getAllTopics();
+
+const khand = categories
+  .map((category) => ({
+    category,
+    topics: topics.filter((topic) => topic.data.category === category.id),
+  }))
+  .filter((entry) => entry.topics.length > 0);
+
+const title = 'Hindi Vyakaran PDF — हिंदी व्याकरण PDF डाउनलोड';
+const description = `हिंदी व्याकरण PDF मुफ़्त डाउनलोड करें — ${topics.length} विषय, सात खंड। संज्ञा, सर्वनाम, संधि, समास, अलंकार और सब कुछ — परिभाषा, भेद, उदाहरण और अभ्यास सहित।`;
+
+const abs = (path: string) => new URL(path, Astro.site).href;
+
+/**
+ * DataDownload on each entry, not just Article. It is the schema type
+ * that says "this page offers a file", and it is what lets the complete
+ * download surface as a download rather than as another blue link.
+ */
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: title,
+    description,
+    inLanguage: 'hi',
+    url: abs(PDF_LANDING_URL),
+    mainEntity: {
+      '@type': 'DataDownload',
+      name: 'सम्पूर्ण हिंदी व्याकरण PDF',
+      encodingFormat: 'application/pdf',
+      contentUrl: abs(COMPLETE_PDF_URL),
+      inLanguage: 'hi',
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'हिंदी व्याकरण PDF — विषय सूची',
+    numberOfItems: topics.length,
+    itemListElement: topics.map((topic, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: `${topic.data.title} PDF`,
+      item: {
+        '@type': 'DataDownload',
+        name: `${topic.data.title} — हिंदी व्याकरण PDF`,
+        encodingFormat: 'application/pdf',
+        contentUrl: abs(pdfUrl(topic)),
+        inLanguage: 'hi',
+      },
+    })),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'मुख्य पृष्ठ', item: abs('/') },
+      { '@type': 'ListItem', position: 2, name: 'Hindi Vyakaran PDF' },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  schema={schema}
+  image="/og-pdf.png"
+  imageAlt="Hindi Vyakaran PDF — हिंदी व्याकरण बुक PDF मुफ़्त डाउनलोड"
+  keywords="hindi vyakaran pdf, hindi grammar pdf, hindi vyakaran pdf download, hindi grammar pdf download, hindi vyakaran book pdf, hindi vyakaran book, हिंदी व्याकरण pdf, हिंदी व्याकरण बुक pdf download"
+>
+  <div class="mx-auto max-w-5xl px-4 py-8 md:py-12">
+    <Breadcrumbs items={[{ label: 'Hindi Vyakaran PDF' }]} />
+
+    <header class="mt-5">
+      <p class="eyebrow text-accent">डाउनलोड · मुफ़्त · बिना पंजीकरण</p>
+
+      {/* The exact-match H1. Latin first because that is the typed
+          query; the Devanagari restates it for the reader who is
+          actually here to read. */}
+      <h1 class="mt-3 text-h1 font-bold text-ink md:text-display">
+        <span class="latin">Hindi Vyakaran PDF</span> — हिंदी व्याकरण PDF
+      </h1>
+
+      <p class="mt-5 max-w-2xl text-lead text-body">
+        पूरा हिंदी व्याकरण PDF में डाउनलोड करें — सात खंड, {topics.length} विषय, परिभाषा, भेद,
+        उदाहरण और अभ्यास सहित। नीचे किसी भी एक विषय की अलग PDF भी ले सकते हैं।
+      </p>
+    </header>
+
+    {/* The primary call to action. One button, above everything else,
+        for the reader who came for the whole book and nothing else.
+        Shared with the home page — see CompletePdfCta. */}
+    <CompletePdfCta class="mt-8" />
+
+    {/* Per-topic downloads, grouped exactly as the home page groups the
+        contents — a reader who knows the site can find संधि here without
+        re-learning the structure. */}
+    <section class="mt-14" aria-labelledby="topics-heading">
+      <div class="flex flex-wrap items-baseline justify-between gap-3">
+        <h2 id="topics-heading" class="m-0 text-h2 font-semibold text-ink">
+          विषय के अनुसार PDF
+        </h2>
+        <p class="m-0 text-meta text-mute">हर विषय की अलग फ़ाइल</p>
+      </div>
+
+      <div class="mt-6 flex flex-col gap-10">
+        {
+          khand.map(({ category, topics: list }) => (
+            <section id={category.id} data-khand={category.id} class="scroll-mt-24">
+              {/* The marker chip is centred against the line, but the two
+                  scripts inside the link share one baseline — centring
+                  Devanagari and Latin separately drops the Latin visibly
+                  below it, which is why the title and its gloss sit in
+                  their own items-baseline row rather than in this one. */}
+              <h3 class="m-0 flex flex-wrap items-center gap-x-3 gap-y-1 border-b-2 border-(--khand) pb-3 text-h3 font-semibold text-ink">
+                <span class="khand-marker shrink-0" aria-hidden="true">
+                  {category.marker}
+                </span>
+                <a
+                  href={categoryUrl(category.id)}
+                  class="flex flex-wrap items-baseline gap-x-2 text-ink no-underline hover:text-(--khand)"
+                >
+                  {category.title}
+                  <span class="font-normal latin">({category.titleEn})</span>
+                </a>
+                <span class="ml-auto text-meta font-normal text-mute">{list.length} विषय</span>
+              </h3>
+
+              <ul class="mt-1 flex list-none flex-col p-0">
+                {list.map((topic) => (
+                  <li class="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-hairline-soft py-3">
+                    {/* The topic link comes first and carries the title:
+                        the row's main job is still to be an internal
+                        link into the grammar, with the file alongside. */}
+                    <a
+                      href={topicUrl(topic)}
+                      class="min-w-0 grow text-ui text-body no-underline hover:text-ink"
+                    >
+                      <span class="font-medium text-ink">{topic.data.title}</span>
+                      <span class="ml-2 text-meta text-mute latin">({topic.data.titleEn})</span>
+                      <span class="mt-0.5 block text-meta text-mute">{topic.data.summary}</span>
+                    </a>
+
+                    <a
+                      href={pdfUrl(topic)}
+                      download={pdfFilename(topic)}
+                      class="inline-flex shrink-0 items-center gap-1.5 rounded-control bg-(--khand-soft) px-3 py-1.5 text-meta font-semibold text-(--khand) no-underline transition-colors hover:bg-(--khand) hover:text-canvas"
+                      aria-label={`${topic.data.title} PDF डाउनलोड करें`}
+                    >
+                      <DownloadIcon class="size-3.5" />
+                      Download PDF
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="mt-14 rounded-panel border border-hairline bg-sunken p-6" aria-labelledby="about-pdf">
+      <h2 id="about-pdf" class="m-0 text-h3 font-semibold text-ink">इन PDF के बारे में</h2>
+      <ul class="mt-3 flex list-none flex-col gap-2 p-0 text-ui text-body">
+        <li>सभी फ़ाइलें मुफ़्त हैं — न पंजीकरण, न लॉगिन, न कोई शुल्क।</li>
+        <li>A4 आकार में, छापने योग्य। देवनागरी फ़ॉन्ट फ़ाइल में ही सम्मिलित है।</li>
+        <li>अभ्यास-प्रश्नों के उत्तर PDF में साथ दिए गए हैं।</li>
+        <li>वेबसाइट बदलने पर PDF भी हर बार नए सिरे से बनती हैं — सामग्री कभी पुरानी नहीं रहती।</li>
+      </ul>
+    </section>
+  </div>
+</BaseLayout>

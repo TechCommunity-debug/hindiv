@@ -1,18 +1,21 @@
 ---
 import { render } from 'astro:content';
-import BaseLayout from '../../../layouts/BaseLayout.astro';
-import Breadcrumbs from '../../../components/Breadcrumbs.astro';
-import Sidebar from '../../../components/Sidebar.astro';
-import Toc from '../../../components/Toc.astro';
-import PrevNext from '../../../components/PrevNext.astro';
-import RelatedTopics from '../../../components/RelatedTopics.astro';
-import Paribhasha from '../../../components/content/Paribhasha.astro';
-import Udaharan from '../../../components/content/Udaharan.astro';
-import Dhyan from '../../../components/content/Dhyan.astro';
-import Abhyas from '../../../components/content/Abhyas.astro';
-import Prashn from '../../../components/content/Prashn.astro';
-import { getAllTopics, getNeighbours, getRelated, categoryUrl } from '../../../lib/content';
-import { getCategory, levels } from '../../../lib/taxonomy';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Sidebar from '../../components/Sidebar.astro';
+import Toc from '../../components/Toc.astro';
+import PrevNext from '../../components/PrevNext.astro';
+import RelatedTopics from '../../components/RelatedTopics.astro';
+import PdfDownload from '../../components/PdfDownload.astro';
+import DownloadIcon from '../../components/DownloadIcon.astro';
+import Paribhasha from '../../components/content/Paribhasha.astro';
+import Udaharan from '../../components/content/Udaharan.astro';
+import Dhyan from '../../components/content/Dhyan.astro';
+import Abhyas from '../../components/content/Abhyas.astro';
+import Prashn from '../../components/content/Prashn.astro';
+import { getAllTopics, getNeighbours, getRelated, categoryUrl } from '../../lib/content';
+import { getCategory, levels } from '../../lib/taxonomy';
+import { pdfUrl, pdfFilename } from '../../lib/pdf';
 
 export async function getStaticPaths() {
   const topics = await getAllTopics();
@@ -52,6 +55,16 @@ const schema = [
     dateModified: updatedIso,
     articleSection: khand?.title,
     mainEntityOfPage: new URL(Astro.url.pathname, Astro.site).href,
+    /* The build-time PDF of this exact topic, declared so "संधि PDF"
+       style queries can resolve to a download rather than to the
+       /pdf/ index page and a second hunt. */
+    associatedMedia: {
+      '@type': 'DataDownload',
+      name: `${title} — हिंदी व्याकरण PDF`,
+      encodingFormat: 'application/pdf',
+      contentUrl: new URL(pdfUrl(topic), Astro.site).href,
+      inLanguage: 'hi',
+    },
   },
   {
     '@context': 'https://schema.org',
@@ -70,10 +83,29 @@ const schema = [
 ];
 ---
 
+{
+  /* og:type=article, with the keyword line built from this topic's own
+     names rather than the site-wide one: a topic page is competing for
+     "संज्ञा किसे कहते हैं" and "sangya in hindi", not for the head term. */
+}
 <BaseLayout
   title={`${title} — परिभाषा, भेद और उदाहरण`}
   description={summary}
   schema={schema}
+  ogType="article"
+  imageAlt={`${title} — हिंदी व्याकरण में परिभाषा, भेद और उदाहरण`}
+  keywords={[
+    title,
+    `${title} किसे कहते हैं`,
+    `${title} के भेद`,
+    `${title} के उदाहरण`,
+    `${title} PDF`,
+    titleEn.toLowerCase(),
+    `${titleEn.toLowerCase()} in hindi`,
+    'hindi vyakaran',
+    'hindi grammar',
+    'हिंदी व्याकरण',
+  ].join(', ')}
 >
   {/* data-khand here is what gives the prose its section colour — the h2
       rules, table headers and blockquotes all read --khand from it. */}
@@ -89,16 +121,36 @@ const schema = [
       <article class="min-w-0">
         <Breadcrumbs
           items={[
-            { label: 'व्याकरण', href: '/vyakaran/' },
             { label: khand?.title ?? category, href: categoryUrl(category) },
             { label: title },
           ]}
         />
 
         <header class="mt-5">
-          <p class="eyebrow text-(--khand)">{khand?.title}</p>
-          <h1 class="mt-2 text-h1 font-bold text-ink md:text-display">{title}</h1>
-          <p class="mt-1 text-ui text-faint latin">{titleEn}</p>
+          <p class="eyebrow text-(--khand)">
+            {khand?.title}
+            {khand && <span class="latin italic">({khand.titleEn})</span>}
+          </p>
+          {/* The heading row carries the download beside it. Kept to the
+              soft khand tint rather than the solid fill used at the foot
+              of the page: up here it sits next to the h1 and must not
+              out-shout it, and the reader who wants the file before
+              reading is in a hurry, not in need of persuading. */}
+          <div class="mt-2 flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+            <h1 class="m-0 text-h1 font-bold text-ink md:text-display">
+              {title} <span class="latin italic">({titleEn})</span>
+            </h1>
+
+            <a
+              href={pdfUrl(topic)}
+              download={pdfFilename(topic)}
+              class="mt-1 inline-flex shrink-0 items-center gap-2 rounded-control bg-(--khand-soft) px-3.5 py-2 text-meta font-semibold text-(--khand) no-underline transition-colors hover:bg-(--khand) hover:text-canvas"
+              aria-label={`${title} PDF डाउनलोड करें`}
+            >
+              <DownloadIcon class="size-3.5" />
+              Download PDF
+            </a>
+          </div>
           <div class="mt-4 h-0.5 w-16 rounded-full bg-(--khand)" aria-hidden="true"></div>
           <p class="mt-4 text-lead text-body">{summary}</p>
 
@@ -132,6 +184,7 @@ const schema = [
           <Content components={{ Paribhasha, Udaharan, Dhyan, Abhyas, Prashn }} />
         </div>
 
+        <PdfDownload topic={topic} />
         <RelatedTopics topics={related} />
         <PrevNext prev={prev} next={next} />
       </article>

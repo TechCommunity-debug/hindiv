@@ -8,8 +8,10 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node scripts/generate-pdfs.mjs",
+    "build:no-pdf": "SKIP_PDF=1 npm run build",
     "preview": "astro preview",
+    "og": "node scripts/generate-og.mjs",
     "check": "astro check",
     "astro": "astro"
   },
@@ -25,6 +27,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "playwright-core": "^1.63.0",
     "typescript": "^6.0.3"
   }
 }

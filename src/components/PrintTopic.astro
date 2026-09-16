@@ -1,0 +1,88 @@
+---
+import { render } from 'astro:content';
+import Paribhasha from './content/Paribhasha.astro';
+import Udaharan from './content/Udaharan.astro';
+import Dhyan from './content/Dhyan.astro';
+import Abhyas from './content/Abhyas.astro';
+import PrintPrashn from './content/PrintPrashn.astro';
+import { getCategory, levels } from '../lib/taxonomy';
+import type { Topic } from '../lib/content';
+
+/**
+ * One topic, rendered for paper.
+ *
+ * Shared by both print routes so a per-topic PDF and the corresponding
+ * chapter of the complete book are byte-for-byte the same rendering —
+ * otherwise the two drift and readers get two different documents for
+ * the same subject.
+ *
+ * `heading` steps the topic title down from h1 to h2 in the complete
+ * book, where the book's own title holds the h1. Structure, not size:
+ * the visual weight is set by the classes either way, so the PDF
+ * outline nests correctly without the chapter titles shrinking.
+ */
+interface Props {
+  topic: Topic;
+  heading?: 'h1' | 'h2';
+}
+
+const { topic, heading = 'h1' } = Astro.props;
+const { title, titleEn, summary, definition, level, category, updated } = topic.data;
+
+const { Content } = await render(topic);
+const khand = getCategory(category);
+
+const Heading = heading;
+const updatedHi = updated.toLocaleDateString('hi-IN', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+{/* data-khand publishes this section's colour to the subtree exactly as
+    it does on the live topic page — the h2 bars, table headers and
+    blockquotes all read --khand from here. */}
+<article class="pdf-topic" data-khand={category}>
+  <header>
+    {/* The {' '} separators are deliberate. Astro collapses the literal
+        whitespace between an expression and the next element here — it
+        does not in the equivalent markup on the live topic page — and
+        the difference is invisible until "संधि (Sandhi)" ships as
+        "संधि(Sandhi)". Writing the space as an expression takes the
+        question away from the compiler and the formatter both. */}
+    <p class="eyebrow text-(--khand)">
+      {khand?.title}{' '}
+      {khand && <span class="latin italic">({khand.titleEn})</span>}
+    </p>
+    <Heading class="mt-2 text-h1 font-bold text-ink">
+      {title}{' '}<span class="latin italic">({titleEn})</span>
+    </Heading>
+    <div class="mt-3 h-0.5 w-16 rounded-full bg-(--khand)" aria-hidden="true"></div>
+    <p class="mt-3 text-lead text-body">{summary}</p>
+
+    <div
+      class="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 border-y border-hairline py-2 text-meta text-mute"
+    >
+      <span
+        data-level={level}
+        class="rounded-pill bg-(--level-soft) px-2 py-0.5 font-medium text-(--level)"
+        >{levels[level].label}</span
+      >
+      <span>{levels[level].hint}</span>
+      <span class="text-faint" aria-hidden="true">·</span>
+      <span>अंतिम बदलाव {updatedHi}</span>
+    </div>
+  </header>
+
+  <div class="prose-hi mt-6">
+    <Paribhasha>
+      <p>{definition}</p>
+    </Paribhasha>
+
+    {/* Same component map as the live route, with one substitution:
+        PrintPrashn stands in for Prashn so the answers are on the page
+        rather than behind a disclosure widget. */}
+    <Content components={{ Paribhasha, Udaharan, Dhyan, Abhyas, Prashn: PrintPrashn }} />
+  </div>
+</article>

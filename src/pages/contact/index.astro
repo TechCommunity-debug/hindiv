@@ -1,0 +1,177 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { CONTACT_EMAIL, SITE_NAME, SITE_URL } from '../../lib/site';
+
+/* The reasons people actually write in, each with the subject line that
+   gets it to the right place fastest. Pre-filling the subject is the whole
+   trick — an inbox of "Hindi vyakaran" subjects sorts into nothing. */
+const reasons = [
+  {
+    title: 'त्रुटि की सूचना',
+    body: 'किसी परिभाषा, उदाहरण या वर्तनी में गलती दिखे तो पृष्ठ का पता (URL) और गलत अंश साथ भेजें।',
+    subject: 'त्रुटि सूचना',
+  },
+  {
+    title: 'सुझाव या नया विषय',
+    body: 'कोई विषय छूट गया हो, या किसी विषय पर और उदाहरण चाहिए हों — बताएँ।',
+    subject: 'सुझाव',
+  },
+  {
+    title: 'शिक्षकों और संस्थानों के लिए',
+    body: 'कक्षा में सामग्री के उपयोग, PDF या किसी शैक्षिक सहयोग के बारे में पूछताछ।',
+    subject: 'शैक्षिक उपयोग',
+  },
+  {
+    title: 'अन्य प्रश्न',
+    body: 'सामग्री के अधिकार, तकनीकी समस्या, या कोई और बात।',
+    subject: 'प्रश्न',
+  },
+];
+
+const mailto = (subject: string) =>
+  `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`[${subject}] Hindi vyakaran`)}`;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'ContactPage',
+  name: 'संपर्क',
+  url: `${SITE_URL}/contact/`,
+  inLanguage: 'hi',
+  description: 'हिंदी व्याकरण संदर्भ से संपर्क करने का पता — त्रुटि सूचना, सुझाव और प्रश्नों के लिए।',
+  mainEntity: {
+    '@type': 'Organization',
+    name: SITE_NAME,
+    url: `${SITE_URL}/`,
+    email: CONTACT_EMAIL,
+    contactPoint: {
+      '@type': 'ContactPoint',
+      email: CONTACT_EMAIL,
+      contactType: 'customer support',
+      availableLanguage: ['hi', 'en'],
+    },
+  },
+};
+---
+
+<BaseLayout
+  title="संपर्क"
+  description={`हिंदी व्याकरण से संपर्क करें — त्रुटि की सूचना, सुझाव या प्रश्न के लिए ${CONTACT_EMAIL} पर ईमेल करें।`}
+  schema={schema}
+>
+  <div class="mx-auto max-w-2xl px-4 py-8 md:py-12">
+    <Breadcrumbs items={[{ label: 'संपर्क' }]} />
+
+    <header class="mt-5">
+      <h1 class="text-h1 font-bold text-ink md:text-display">संपर्क</h1>
+      <p class="mt-4 text-lead text-body">
+        त्रुटि की सूचना, सुझाव या कोई प्रश्न — हमें ईमेल करें। हर संदेश पढ़ा जाता है।
+      </p>
+    </header>
+
+    {/*
+      The address itself, given once and given large. There is no contact
+      form: this is a static site with no server to receive one, and a form
+      that silently drops messages would be worse than no form at all.
+    */}
+    <section
+      class="mt-8 rounded-card border border-hairline bg-surface px-5 py-6 sm:px-6"
+      aria-labelledby="email-heading"
+    >
+      <p id="email-heading" class="eyebrow">ईमेल</p>
+      <p class="mt-2 break-all font-serif text-h2 font-semibold text-ink latin">
+        <a href={`mailto:${CONTACT_EMAIL}`} class="no-underline hover:underline">{CONTACT_EMAIL}</a>
+      </p>
+
+      <div class="mt-5 flex flex-wrap gap-3">
+        <a
+          href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Hindi vyakaran')}`}
+          class="inline-flex items-center rounded-pill bg-accent px-5 py-3 text-ui font-semibold text-white no-underline transition-colors hover:bg-accent-deep"
+        >
+          ईमेल लिखें
+        </a>
+        <button
+          type="button"
+          data-copy-email={CONTACT_EMAIL}
+          class="inline-flex items-center rounded-pill border border-hairline bg-canvas px-5 py-3 text-ui font-medium text-body transition-colors hover:text-ink"
+        >
+          <span data-copy-label>पता कॉपी करें</span>
+        </button>
+      </div>
+
+      <p class="mt-4 text-meta text-mute">
+        उत्तर सामान्यतः कुछ दिनों में मिल जाता है। यह एक छोटी, स्वतंत्र परियोजना है, इसलिए कभी-कभी
+        कुछ समय लग सकता है।
+      </p>
+    </section>
+
+    <section class="mt-10" aria-labelledby="reasons-heading">
+      <h2 id="reasons-heading" class="text-h2 font-semibold text-ink">किस विषय में लिख रहे हैं?</h2>
+      <p class="mt-2 text-ui text-body">
+        नीचे से उपयुक्त विकल्प चुनें — विषय-पंक्ति स्वयं भर जाएगी, जिससे आपका संदेश जल्दी सही जगह
+        पहुँचेगा।
+      </p>
+
+      <ul class="mt-5 grid gap-3 p-0 sm:grid-cols-2">
+        {
+          reasons.map((reason) => (
+            <li class="list-none">
+              <a
+                href={mailto(reason.subject)}
+                class="flex h-full flex-col rounded-card border border-hairline bg-canvas px-4 py-4 no-underline transition-colors hover:border-accent hover:bg-surface"
+              >
+                <span class="font-serif text-h3 font-semibold text-ink">{reason.title}</span>
+                <span class="mt-1.5 text-ui text-body">{reason.body}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <div class="prose-hi mt-10">
+      <h2>संदेश में क्या भेजें</h2>
+      <p>
+        त्रुटि की सूचना देते समय इतना भर पर्याप्त है — पृष्ठ का पता, जिस अंश में गलती है वह वाक्य,
+        और आपके अनुसार सही रूप क्या होना चाहिए। यदि किसी मानक व्याकरण ग्रंथ का संदर्भ दे सकें तो और
+        भी अच्छा, क्योंकि कई प्रश्नों पर ग्रंथों में मतभेद है।
+      </p>
+
+      <h2>कुछ बातें स्पष्ट रूप से</h2>
+      <ul>
+        <li>यह एक शैक्षिक संदर्भ है — हम गृहकार्य या परीक्षा के उत्तर नहीं लिखकर देते।</li>
+        <li>कृपया ईमेल में कोई व्यक्तिगत या गोपनीय जानकारी न भेजें।</li>
+        <li>
+          विज्ञापन, लिंक-विनिमय और प्रायोजित सामग्री के प्रस्ताव स्वीकार नहीं किए जाते।
+        </li>
+      </ul>
+      <p>
+        आपके ईमेल का उपयोग हम केवल उसका उत्तर देने के लिए करते हैं — विवरण
+        <a href="/privacy/">गोपनीयता नीति</a> में।
+      </p>
+    </div>
+  </div>
+</BaseLayout>
+
+{/*
+  Copy-to-clipboard is an enhancement only: the address is already a plain
+  mailto link above, so a browser without clipboard access loses nothing.
+*/}
+<script>
+  const button = document.querySelector<HTMLButtonElement>('[data-copy-email]');
+  const label = button?.querySelector<HTMLElement>('[data-copy-label]');
+
+  button?.addEventListener('click', async () => {
+    if (!label) return;
+    const original = 'पता कॉपी करें';
+    try {
+      await navigator.clipboard.writeText(button.dataset.copyEmail ?? '');
+      label.textContent = 'कॉपी हो गया';
+    } catch {
+      label.textContent = 'कॉपी नहीं हो सका';
+    }
+    window.setTimeout(() => {
+      label.textContent = original;
+    }, 2000);
+  });
+</script>

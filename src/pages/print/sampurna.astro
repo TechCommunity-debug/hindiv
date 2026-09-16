@@ -1,0 +1,119 @@
+---
+import PrintLayout from '../../layouts/PrintLayout.astro';
+import PrintTopic from '../../components/PrintTopic.astro';
+import { getAllTopics } from '../../lib/content';
+import { categories } from '../../lib/taxonomy';
+
+/**
+ * सम्पूर्ण हिंदी व्याकरण — the whole work as one printable document.
+ *
+ * Rendered to /pdf/hindi-vyakaran.pdf in a single Chrome pass rather
+ * than by concatenating the per-topic PDFs. That matters for more than
+ * tidiness: one pass gives continuous page numbering, one internally
+ * consistent outline, and font subsets embedded once instead of forty
+ * times — the difference between a file a reader on a slow connection
+ * will actually finish downloading and one they will not.
+ */
+const topics = await getAllTopics();
+
+const khand = categories
+  .map((category) => ({
+    category,
+    topics: topics.filter((topic) => topic.data.category === category.id),
+  }))
+  .filter((entry) => entry.topics.length > 0);
+
+const built = new Date();
+const builtHi = built.toLocaleDateString('hi-IN', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<PrintLayout
+  title="सम्पूर्ण हिंदी व्याकरण — Hindi Vyakaran PDF"
+  description={`हिंदी व्याकरण के ${topics.length} विषय — परिभाषा, भेद, उदाहरण और अभ्यास सहित, एक ही दस्तावेज़ में।`}
+>
+  {/* Title page. */}
+  <section class="pdf-front flex min-h-[9in] flex-col">
+    <div class="spectrum-rule" role="presentation"></div>
+
+    <div class="grow pt-24">
+      <p class="eyebrow text-accent">संदर्भ · अध्ययन · अभ्यास</p>
+      <h1 class="mt-5 font-serif text-display font-bold text-ink">सम्पूर्ण हिंदी व्याकरण</h1>
+      <p class="mt-3 text-h2 font-normal text-mute latin">Complete Hindi Vyakaran</p>
+
+      <p class="mt-8 max-w-xl text-lead text-body">
+        परिभाषा, भेद, उदाहरण और अभ्यास — सब कुछ सरल हिंदी में। सात खंड, {topics.length} विषय,
+        पढ़ने और अभ्यास करने के क्रम में।
+      </p>
+    </div>
+
+    <div class="border-t border-hairline pt-4 text-meta text-mute">
+      <p class="m-0">संस्करण {builtHi}</p>
+      <p class="m-0 mt-1 latin">hindivyakaran.net</p>
+    </div>
+  </section>
+
+  {/* विषय-सूची. No page numbers: they would have to be guessed before
+      Chrome has paginated anything, and a table of contents that is
+      confidently wrong is worse than one that is merely an index. The
+      PDF outline and the reader's own page bar carry the navigation. */}
+  <section class="pdf-front">
+    <h2 class="font-serif text-h1 font-bold text-ink">विषय-सूची</h2>
+
+    <div class="mt-6 flex flex-col gap-6">
+      {
+        khand.map(({ category, topics: list }) => (
+          <div data-khand={category.id}>
+            <h3 class="m-0 flex flex-wrap items-baseline gap-x-2 border-b-2 border-(--khand) pb-1.5 text-h3 font-semibold text-ink">
+              <span class="khand-marker shrink-0" aria-hidden="true">
+                {category.marker}
+              </span>
+              {category.title}
+              <span class="font-normal latin">({category.titleEn})</span>
+            </h3>
+            <ol class="mt-2 flex list-none flex-col p-0">
+              {list.map((topic) => (
+                <li class="flex items-baseline gap-2 border-b border-hairline-soft py-1 text-ui text-body">
+                  <span class="size-1.5 shrink-0 rounded-full bg-(--khand)" aria-hidden="true" />
+                  {topic.data.title}
+                  <span class="text-meta text-mute latin">({topic.data.titleEn})</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  {
+    khand.map(({ category, topics: list }) => (
+      <section data-khand={category.id}>
+        {/* The खंड band, carried over from the home page's contents list
+            so the printed volume and the site divide identically. */}
+        <div class="pdf-khand flex flex-wrap items-center gap-x-3 gap-y-2 rounded-card bg-(--khand) px-4 py-3">
+          <span
+            class="inline-flex h-7 min-w-7 shrink-0 items-center justify-center rounded-control bg-canvas/25 px-1.5 font-mono text-meta font-semibold text-canvas"
+            aria-hidden="true"
+          >
+            {category.marker}
+          </span>
+          <h2 class="m-0 flex flex-wrap items-baseline gap-x-2 text-h3 font-semibold text-canvas">
+            {category.title}
+            <span class="font-normal latin">({category.titleEn})</span>
+          </h2>
+          <span class="ml-auto text-meta text-canvas/75">{list.length} विषय</span>
+        </div>
+
+        <p class="mt-3 mb-8 text-ui text-body">{category.summary}</p>
+
+        {list.map((topic) => (
+          <PrintTopic topic={topic} heading="h2" />
+        ))}
+      </section>
+    ))
+  }
+</PrintLayout>

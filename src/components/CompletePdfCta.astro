@@ -1,0 +1,63 @@
+---
+import DownloadIcon from './DownloadIcon.astro';
+import { categories } from '../lib/taxonomy';
+import { getAllTopics } from '../lib/content';
+import { COMPLETE_PDF_URL, COMPLETE_PDF_FILENAME } from '../lib/pdf';
+
+/**
+ * The complete-book download block.
+ *
+ * Lives on both the home page (above the footer, where a reader who has
+ * just scrolled the whole contents list is most likely to want the
+ * whole thing) and at the top of /pdf/. One component rather than two
+ * copies: the counts, the filename and the wording have to agree in
+ * both places, and the filename in particular is the kind of thing that
+ * gets changed in one file and forgotten in the other.
+ *
+ * `headingLevel` exists because the two hosts sit at different depths
+ * in their document outline — h2 under the landing page's h1, h2 on the
+ * home page too, but the prop keeps that a decision of the caller
+ * rather than an assumption baked in here.
+ */
+interface Props {
+  headingLevel?: 'h2' | 'h3';
+  class?: string;
+}
+
+const { headingLevel: Heading = 'h2', class: className } = Astro.props;
+
+const topics = await getAllTopics();
+const headingId = 'complete-pdf-heading';
+---
+
+<section
+  class:list={['rounded-panel border border-hairline bg-surface p-6 md:p-8', className]}
+  aria-labelledby={headingId}
+>
+  {/* The seven-khand spectrum, standing in for a cover image: it says
+      "all seven sections in one file" without a word of marketing. */}
+  <div class="spectrum-rule mb-6 rounded-full" role="presentation"></div>
+
+  <Heading id={headingId} class="m-0 text-h2 font-semibold text-ink">
+    सम्पूर्ण हिंदी व्याकरण PDF
+  </Heading>
+  <p class="mt-2 max-w-2xl text-ui text-body">
+    सातों खंड एक ही फ़ाइल में — विषय-सूची, क्रमबद्ध अध्याय और हर विषय के अभ्यास-प्रश्न उत्तर सहित।
+    छापने योग्य A4 पृष्ठ।
+  </p>
+
+  <div class="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
+    <a
+      href={COMPLETE_PDF_URL}
+      download={COMPLETE_PDF_FILENAME}
+      class="inline-flex items-center gap-2.5 rounded-pill bg-accent px-6 py-3.5 text-lead font-semibold text-white no-underline transition-colors hover:bg-accent-deep"
+    >
+      <DownloadIcon class="size-5" />
+      Download Complete Hindi Vyakaran PDF
+    </a>
+
+    <p class="m-0 text-meta text-mute">
+      {topics.length} विषय · {categories.length} खंड · हिंदी
+    </p>
+  </div>
+</section>

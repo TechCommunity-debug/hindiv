@@ -1,0 +1,44 @@
+---
+import PrintLayout from '../../../layouts/PrintLayout.astro';
+import PrintTopic from '../../../components/PrintTopic.astro';
+import { getAllTopics } from '../../../lib/content';
+import { getCategory } from '../../../lib/taxonomy';
+
+/**
+ * The per-topic printable page. Chrome renders one of these per topic
+ * into /pdf/<category>/<slug>.pdf during the post-build step.
+ *
+ * It mirrors the live route's params so the two stay legible side by
+ * side: /varn-vichar/sandhi/ is the page, /print/varn-vichar/sandhi/ is
+ * what that page looks like on paper.
+ */
+export async function getStaticPaths() {
+  const topics = await getAllTopics();
+  return topics.map((topic) => ({
+    params: { category: topic.data.category, slug: topic.id },
+    props: { topic },
+  }));
+}
+
+const { topic } = Astro.props;
+const khand = getCategory(topic.data.category);
+---
+
+<PrintLayout
+  title={`${topic.data.title} — हिंदी व्याकरण`}
+  description={topic.data.summary}
+>
+  <PrintTopic topic={topic} />
+
+  {/* The colophon. A PDF outlives the page it came from and gets mailed
+      around detached from any link, so the file has to say where it is
+      from and where the current version lives. */}
+  <footer class="mt-10 border-t border-hairline pt-4 text-meta text-mute">
+    <p class="m-0">
+      {khand?.title} · Hindi vyakaran — हिंदी व्याकरण का व्यवस्थित संदर्भ
+    </p>
+    <p class="m-0 mt-1 latin">
+      hindivyakaran.net/{topic.data.category}/{topic.id}/
+    </p>
+  </footer>
+</PrintLayout>

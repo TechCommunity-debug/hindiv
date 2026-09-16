@@ -1,4 +1,9 @@
 User-agent: *
 Allow: /
 
+# Bare, unstyled duplicates of the topic pages, kept only so the build
+# can render them to PDF. The rendered files under /pdf/ stay crawlable —
+# they are the whole point of the /pdf/ landing page.
+Disallow: /print/
+
 Sitemap: https://hindivyakaran.net/sitemap-index.xml

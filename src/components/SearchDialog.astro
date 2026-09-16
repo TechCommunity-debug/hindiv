@@ -187,6 +187,17 @@
     render('');
   });
 
+  // ?q=… opens the dialog already searching. This is the entry point the
+  // home page declares to search engines as its SearchAction, so it has to
+  // work for a visitor arriving cold on a deep link — not only for the
+  // reader who is already here and presses "/".
+  const initial = new URLSearchParams(location.search).get('q');
+  if (initial) {
+    open();
+    input.value = initial;
+    render(initial);
+  }
+
   document.addEventListener('keydown', (event) => {
     const target = event.target as HTMLElement | null;
     const typing =

@@ -2,12 +2,15 @@
 import SearchTrigger from './SearchTrigger.astro';
 import ThemeToggle from './ThemeToggle.astro';
 import { categories } from '../lib/taxonomy';
+import { categoryUrl } from '../lib/content';
+import { sitePages } from '../lib/site';
 
 const path = Astro.url.pathname;
 const isActive = (href: string) => path === href || path.startsWith(href);
 
+/* No व्याकरण entry: the home page *is* the contents list now, and the
+   wordmark to the left already leads there. */
 const nav = [
-  { href: '/vyakaran/', label: 'व्याकरण' },
   { href: '/shabdkosh/', label: 'शब्दकोश' },
   { href: '/parichay/', label: 'परिचय' },
 ];
@@ -21,9 +24,9 @@ const nav = [
     <a
       href="/"
       class="flex shrink-0 items-baseline gap-2 no-underline"
-      aria-label="हिंदी व्याकरण — मुख्य पृष्ठ"
+      aria-label="Hindi vyakaran — मुख्य पृष्ठ"
     >
-      <span class="font-serif text-h3 font-bold tracking-normal text-ink">हिंदी व्याकरण</span>
+      <span class="font-serif text-h3 font-bold tracking-normal text-ink">Hindi vyakaran</span>
     </a>
 
     <nav class="ml-4 hidden items-center gap-1 md:flex" aria-label="मुख्य">
@@ -41,15 +44,39 @@ const nav = [
           </a>
         ))
       }
+
+      {/* The standing pages, in Latin. A thin rule sets them off from the
+          content nav to their left — they lead out of the grammar, not
+          further into it. */}
+      <span class="mx-1 h-4 w-px shrink-0 bg-hairline" aria-hidden="true"></span>
+
+      {
+        sitePages.map((page) => (
+          <a
+            href={page.href}
+            title={page.label}
+            class:list={[
+              'rounded-control px-2.5 py-1.5 text-ui no-underline transition-colors latin',
+              isActive(page.href) ? 'bg-sunken text-ink' : 'text-body hover:text-ink',
+            ]}
+            aria-current={isActive(page.href) ? 'page' : undefined}
+          >
+            {page.navEn}
+          </a>
+        ))
+      }
     </nav>
 
     <div class="ml-auto flex items-center gap-2">
-      <SearchTrigger class="hidden w-56 md:flex lg:w-64" />
+      {/* The nav carries six items now, so the search field waits for lg —
+          at md it and the nav together overflow the row. Below lg the icon
+          button opens the same dialog. */}
+      <SearchTrigger class="hidden w-56 lg:flex lg:w-64" />
 
       <button
         type="button"
         data-search-open
-        class="rounded-control border border-hairline p-2 text-body md:hidden"
+        class="rounded-control border border-hairline p-2 text-body lg:hidden"
         aria-label="खोजें"
       >
         <svg class="size-4" viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -103,11 +130,29 @@ const nav = [
           categories.map((category) => (
             <li data-khand={category.id}>
               <a
-                href={`/vyakaran/${category.id}/`}
+                href={categoryUrl(category.id)}
                 class="flex items-center gap-3 rounded-control px-3 py-2 no-underline hover:bg-(--khand-soft)"
               >
                 <span class="khand-marker shrink-0">{category.marker}</span>
                 <span class="text-ui text-body">{category.title}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      {/* Same four links as the desktop nav. The menu has the width for the
+          full labels, so they are given unabbreviated here. */}
+      <p class="eyebrow mt-4 px-3">साइट</p>
+      <ul class="mt-1 flex flex-col gap-0.5">
+        {
+          sitePages.map((page) => (
+            <li>
+              <a
+                href={page.href}
+                class="block rounded-control px-3 py-2 text-ui text-body no-underline hover:bg-sunken latin"
+              >
+                {page.labelEn}
               </a>
             </li>
           ))
@@ -121,9 +166,18 @@ const nav = [
   const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
   const menu = document.getElementById('mobile-menu');
 
+  const setOpen = (open: boolean) => {
+    toggle?.setAttribute('aria-expanded', String(open));
+    if (menu) menu.hidden = !open;
+  };
+
   toggle?.addEventListener('click', () => {
-    const open = toggle.getAttribute('aria-expanded') === 'true';
-    toggle.setAttribute('aria-expanded', String(!open));
-    if (menu) menu.hidden = open;
+    setOpen(toggle.getAttribute('aria-expanded') !== 'true');
+  });
+
+  /* खंड links are now same-page anchors when the reader is already on the
+     home page, so nothing would close the menu over the target. */
+  menu?.addEventListener('click', (event) => {
+    if ((event.target as HTMLElement).closest('a')) setOpen(false);
   });
 </script>

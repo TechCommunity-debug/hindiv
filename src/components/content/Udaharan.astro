@@ -23,7 +23,7 @@ const { items, label = 'उदाहरण' } = Astro.props;
 
   {
     items && items.length > 0 && (
-      <ul class="mt-2 flex list-none flex-wrap gap-x-2 gap-y-1.5 p-0">
+      <ul class="not-prose mt-2 flex list-none flex-wrap gap-x-2 gap-y-1.5 p-0">
         {items.map((item) => (
           <li class="rounded-control border border-ochre/20 bg-surface px-2.5 py-1 text-ui text-ink">
             {item}

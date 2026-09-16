@@ -9,7 +9,26 @@ export default defineConfig({
   site: 'https://hindivyakaran.net',
   trailingSlash: 'always',
 
-  integrations: [mdx(), sitemap()],
+  // The /print/ routes exist only to be rasterised into PDFs by
+  // scripts/generate-pdfs.mjs; they are bare duplicates of real topic
+  // pages, so listing them would be asking to be judged on duplicate
+  // content. pdf-manifest.json is build scaffolding the same script
+  // deletes on its way out. Both are also noindex at the page level —
+  // this keeps them out of the sitemap as well, so nothing invites a
+  // crawler to them in the first place.
+  integrations: [
+    mdx(),
+    sitemap({
+      filter: (page) => !/\/print\/|\/pdf-manifest\.json$/.test(page),
+    }),
+  ],
+
+  // Astro's HTML compressor collapses whitespace that spans a newline down to
+  // nothing, so an inline <a> wrapped onto its own line in a paragraph loses
+  // the space before it — "…पूछना हो तो<a>…". Prose here is wrapped for
+  // readability and links sit mid-sentence all over the standing pages, so the
+  // few bytes saved are not worth proof-reading every line break.
+  compressHTML: false,
 
   vite: {
     plugins: [tailwindcss()],

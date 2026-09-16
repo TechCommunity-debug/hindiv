@@ -4,9 +4,18 @@ import { categories, categoryById, type CategoryId } from './taxonomy';
 export type Topic = CollectionEntry<'topics'>;
 export type Term = CollectionEntry<'terms'>;
 
-export const categoryUrl = (id: CategoryId | string) => `/vyakaran/${id}/`;
+/**
+ * A खंड has no page of its own — the home page lists all seven with their
+ * topics, so a खंड "link" is an anchor into that list rather than a route.
+ */
+export const categoryUrl = (id: CategoryId | string) => `/#${id}`;
 
-export const topicUrl = (topic: Topic) => `/vyakaran/${topic.data.category}/${topic.id}/`;
+/**
+ * Topic URLs sit at the site root: /varn-vichar/sandhi/, not
+ * /vyakaran/varn-vichar/sandhi/. The domain is already hindivyakaran.net,
+ * so a /vyakaran/ segment only repeated what the host name says.
+ */
+export const topicUrl = (topic: Topic) => `/${topic.data.category}/${topic.id}/`;
 
 /** All topics, ordered by khand first and then by the author's `order`. */
 export async function getAllTopics(): Promise<Topic[]> {
@@ -16,11 +25,6 @@ export async function getAllTopics(): Promise<Topic[]> {
     const byKhand = (rank.get(a.data.category) ?? 99) - (rank.get(b.data.category) ?? 99);
     return byKhand !== 0 ? byKhand : a.data.order - b.data.order;
   });
-}
-
-export async function getTopicsByCategory(id: CategoryId): Promise<Topic[]> {
-  const topics = await getAllTopics();
-  return topics.filter((t) => t.data.category === id);
 }
 
 /**

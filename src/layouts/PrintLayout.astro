@@ -1,0 +1,183 @@
+---
+import '../styles/global.css';
+import { Font } from 'astro:assets';
+
+/**
+ * The surface Chrome renders to PDF at build time.
+ *
+ * Deliberately not BaseLayout: a printed page has no sticky header, no
+ * search, no theme toggle and no sidebar, and every one of those would
+ * either bleed into the output or leave a hole where it used to sit.
+ * What it does share is global.css, so the PDFs carry the same type
+ * scale, khand colours and prose rhythm as the site — the file a reader
+ * downloads should look like the page they downloaded it from.
+ *
+ * These routes are noindex and excluded from the sitemap (see
+ * astro.config.mjs and public/robots.txt). They exist to be rasterised,
+ * not to rank — the /pdf/ landing page does the ranking.
+ */
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+{/* Theme pinned light. A PDF is ink on paper; dark mode would render as
+    a solid black page and eat a printer's toner cartridge. */}
+<html lang="hi" dir="ltr" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content="noindex, nofollow" />
+
+    {/* Both faces preloaded, unlike the site: the renderer waits on
+        document.fonts.ready, and a lazily-fetched face is the one way
+        this pipeline silently ships a PDF full of tofu boxes. */}
+    <Font cssVariable="--font-devanagari-sans" preload />
+    <Font cssVariable="--font-devanagari-serif" preload />
+  </head>
+
+  <body class="bg-white">
+    <div class="mx-auto max-w-3xl px-0 py-0">
+      <slot />
+    </div>
+  </body>
+</html>
+
+<style is:global>
+  /*
+    Print rules. Chrome's PDF renderer honours these the same way a
+    printer does, so everything below is about the one thing screen CSS
+    never has to answer: where is it acceptable for a page to end?
+  */
+
+  /* Tints, khand colour bands and the spectrum rule are wayfinding, not
+     decoration — without this Chrome drops every background and the
+     seven sections become indistinguishable in print. */
+  html,
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    background: #fff !important;
+  }
+
+  /* A heading stranded at the foot of a page is the classic PDF tell. */
+  h1,
+  h2,
+  h3,
+  h4 {
+    break-after: avoid-page;
+    break-inside: avoid-page;
+  }
+
+  /*
+    Devanagari ink does not fit the line boxes the heading scale gives
+    it. A conjunct with a matra above and a nukta below is taller than
+    24px × 1.5, so the glyphs overflow their line box — invisibly on
+    screen, because nothing is clipped there and the next line starts
+    far enough down.
+
+    Under fragmentation it stops being invisible. Margins collapse away
+    at a page break, so a heading pushed to the next page starts flush
+    at the top of the text area, and the ink that overflows above its
+    line box is painted into the *previous* page's fragmentainer: a
+    2px crescent of a शिरोरेखा marooned at the foot of a page, one
+    page above the heading it belongs to.
+
+    Opening the leading so the line box actually contains the script is
+    the fix rather than a workaround — there is nothing left hanging
+    outside the box to be stranded. Headings breathe a little more in
+    print than on screen, which is the right direction for paper.
+  */
+  h1,
+  h2 {
+    line-height: 1.75;
+  }
+  h3,
+  h4 {
+    line-height: 1.85;
+  }
+
+  /* Callouts (परिभाषा, उदाहरण, ध्यान दें, अभ्यास) and tables are single
+     units of meaning; splitting one across a page break costs the
+     reader the whole point of it. Tables get a repeated header row. */
+  .prose-hi :is(aside, blockquote, figure),
+  .prose-hi .not-prose {
+    break-inside: avoid-page;
+  }
+
+  /*
+    Tables are the one place the screen stylesheet has to be undone
+    rather than extended. There, `display: block` + `overflow-x: auto`
+    turns a table into its own horizontal scroll container, so a dense
+    conjugation table scrolls on a phone instead of squeezing Devanagari
+    until it wraps mid-word. On paper there is nothing to scroll: the
+    block box just gets sliced wherever the page happens to end — that
+    is the stray 2px of border that used to land at the foot of a page —
+    and `display: table-header-group` below is inert while the ancestor
+    is not a real table, so a table spanning a break loses its header
+    row exactly when the reader most needs it.
+
+    Restoring display: table fixes all three at once. The trade the
+    screen rule was making no longer applies, because a PDF page is a
+    fixed 178mm of measure and a table that does not fit has to wrap
+    rather than scroll.
+  */
+  .prose-hi table {
+    display: table !important;
+    width: 100% !important;
+    overflow: visible !important;
+    break-inside: auto;
+  }
+  .prose-hi thead {
+    display: table-header-group;
+  }
+  .prose-hi tr {
+    break-inside: avoid-page;
+  }
+  /* nowrap is what would force the overflow display: table can't absorb. */
+  .prose-hi :is(th, td) {
+    white-space: normal !important;
+  }
+
+  /* Orphan/widow control, in reading terms: never one line alone. */
+  p,
+  li {
+    orphans: 2;
+    widows: 2;
+  }
+
+  /*
+    Pagination of the complete book, in the terms a printed व्याकरण uses:
+    every खंड opens a new sheet, and so does every topic inside it — with
+    the exception of the topic that opens the खंड, which sits directly
+    under its section band rather than one page after it. That exception
+    is what :first-of-type buys: .pdf-khand is a <div> and .pdf-topic an
+    <article>, so "first article in this section" is exactly the topic
+    that follows the band. The same rule leaves a single-topic PDF with
+    no stray blank leading page.
+  */
+  .pdf-khand,
+  .pdf-topic {
+    break-before: page;
+  }
+  .pdf-topic:first-of-type {
+    break-before: auto;
+  }
+  .pdf-front {
+    break-after: page;
+  }
+
+  /* Links stay coloured (they remain clickable in the PDF) but the URL
+     is never appended — a Devanagari page hung with bare Latin URLs is
+     unreadable, and the reader has the site if they want it. */
+  a[href]::after {
+    content: none !important;
+  }
+</style>

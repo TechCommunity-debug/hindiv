@@ -39,7 +39,7 @@ export const categories: Category[] = [
     id: 'varn-vichar',
     title: 'वर्ण विचार',
     titleEn: 'Phonology',
-    summary: 'ध्वनि और वर्ण का अध्ययन — वर्णमाला, स्वर, व्यंजन, संधि और उच्चारण।',
+    summary: 'ध्वनि और वर्ण का अध्ययन — वर्णमाला, स्वर, व्यंजन, संधि, उच्चारण और विराम चिह्न।',
     marker: 'II',
   },
   {
@@ -53,7 +53,7 @@ export const categories: Category[] = [
     id: 'vakya-vichar',
     title: 'वाक्य विचार',
     titleEn: 'Syntax',
-    summary: 'वाक्य की रचना, भेद, पदबंध, उपवाक्य, वाक्य-शुद्धि और विराम चिह्न।',
+    summary: 'वाक्य की रचना, भेद, पदबंध, उपवाक्य, वाक्य-परिवर्तन और वाक्य-शुद्धि।',
     marker: 'IV',
   },
   {
@@ -110,5 +110,3 @@ export const levels = {
   madhyam: { label: 'मध्यम', hint: 'विस्तृत विवेचन' },
   unnat: { label: 'उन्नत', hint: 'गहन अध्ययन' },
 } as const;
-
-export type Level = keyof typeof levels;

@@ -1,0 +1,29 @@
+---
+/**
+ * The print counterpart of <Prashn>.
+ *
+ * On the site a practice answer hides behind a <details> — a visible
+ * answer is not practice. On paper there is nothing to click, and a
+ * PDF full of collapsed questions is a PDF with the answers missing,
+ * so the answer is simply set below the question in the same green the
+ * reveal uses on screen.
+ *
+ * Passed to <Content components={...}> by the print routes, which is
+ * why no content file has to know two versions of itself exist.
+ */
+interface Props {
+  q: string;
+  a: string;
+}
+
+const { q, a } = Astro.props;
+---
+
+<li class="list-none">
+  <div class="rounded-card border border-hairline bg-surface">
+    <p class="m-0 px-4 py-3 text-ui text-ink">{q}</p>
+    <p class="m-0 border-t border-hairline-soft bg-correct-soft px-4 py-3 text-ui text-body">
+      <span class="eyebrow mr-2 text-correct">उत्तर</span>{a}
+    </p>
+  </div>
+</li>
