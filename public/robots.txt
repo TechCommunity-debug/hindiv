@@ -1,6 +1,6 @@
 User-agent: *
 Allow: /
 
-Disallow: /print/
-
 Sitemap: https://hindivyakaran.net/sitemap-index.xml
+
+Disallow: /print/
