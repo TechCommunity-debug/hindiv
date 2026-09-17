@@ -525,17 +525,24 @@
     kaarak markers, sandhi transformations. On phones they scroll
     horizontally inside their own wrapper rather than squeezing columns
     until the Devanagari wraps mid-word.
+
+    The scroll container (.table-scroll, added by the rehype step in
+    astro.config.mjs) and the table itself are deliberately separate
+    boxes: a table that scrolls itself via `display: block` leaves its
+    real table layout shrink-wrapped inside that block box, stranding
+    empty space whenever the columns are narrower than the container.
   */
-  & table:not(:where(.not-prose, .not-prose *)) {
+  & .table-scroll:not(:where(.not-prose, .not-prose *)) {
     display: block;
-    /* max-content + min-width:100% is the pair that makes a table stretch
-       to fill when it fits and scroll inside itself when it doesn't. */
-    width: max-content;
-    min-width: 100%;
     max-width: 100%;
     overflow-x: auto;
     overscroll-behavior-x: contain;
     margin-block: 1.5em;
+  }
+
+  & .table-scroll:not(:where(.not-prose, .not-prose *)) > table {
+    width: 100%;
+    margin-block: 0;
     border: 1px solid var(--color-hairline);
     border-radius: var(--radius-card);
     /* `collapse` would suppress the border radius. */

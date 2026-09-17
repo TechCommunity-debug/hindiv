@@ -4,6 +4,31 @@ import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
+/** Wraps every `<table>` in `<div class="table-scroll">` so the scroll
+ *  container and the table layout are separate boxes — see the markdown
+ *  config comment below for why that split is necessary. */
+function wrapTablesForScroll() {
+  return (/** @type {any} */ tree) => {
+    /** @param {any} node */
+    function visit(node) {
+      if (!node.children) return;
+      node.children = node.children.map((/** @type {any} */ child) => {
+        visit(child);
+        if (child.type === 'element' && child.tagName === 'table') {
+          return {
+            type: 'element',
+            tagName: 'div',
+            properties: { className: ['table-scroll'] },
+            children: [child],
+          };
+        }
+        return child;
+      });
+    }
+    visit(tree);
+  };
+}
+
 // https://astro.build/config
 export default defineConfig({
   site: 'https://hindivyakaran.net',
@@ -58,12 +83,18 @@ export default defineConfig({
     },
   ],
 
-  // Sätteri (Astro 7's default Rust Markdown pipeline) is left as-is.
-  // Table overflow is handled in CSS rather than by a hast plugin, which
-  // keeps the Markdown toolchain dependency-free — see `prose-hi` in
-  // src/styles/global.css.
+  // A table can't both stretch to fill when it fits and scroll when it
+  // doesn't via CSS alone — display:block on the <table> itself leaves the
+  // real (anonymous) table box shrink-wrapped inside it, stranding empty
+  // space to the right whenever the columns are narrower than the
+  // container. Wrapping each table in its own scroll div fixes that; the
+  // scroll styling lives on `.table-scroll` in `prose-hi`,
+  // src/styles/global.css. That wrap needs a rehype plugin, which needs
+  // @astrojs/markdown-remark's unified pipeline in place of Astro 7's
+  // default Rust processor (Sätteri) — the dependency this trades in for.
   markdown: {
     shikiConfig: { theme: 'github-light', wrap: true },
+    rehypePlugins: [wrapTablesForScroll],
   },
 
   prefetch: {

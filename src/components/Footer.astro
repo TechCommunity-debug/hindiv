@@ -38,7 +38,7 @@ const year = new Date().getFullYear();
                     class="flex items-center gap-2.5 text-ui text-body no-underline hover:text-ink"
                   >
                     <span class="size-1.5 shrink-0 rounded-full bg-(--khand)" aria-hidden="true" />
-                    {category.title}
+                    <span class="latin text-faint">({category.titleEn})</span> {category.title}
                   </a>
                 </li>
               ))
@@ -50,25 +50,28 @@ const year = new Date().getFullYear();
           <p class="eyebrow">सामग्री</p>
           <ul class="mt-3 flex flex-col gap-2">
             <li>
-              <a href="/" class="text-ui text-body no-underline hover:text-ink">सभी विषय</a>
+              <a href="/" class="text-ui text-body no-underline hover:text-ink"
+                ><span class="latin text-faint">(All topics)</span> सभी विषय</a
+              >
             </li>
             <li>
               <a href="/shabdkosh/" class="text-ui text-body no-underline hover:text-ink"
-                >शब्दकोश</a
+                ><span class="latin text-faint">(Dictionary)</span> शब्दकोश</a
               >
             </li>
             <li>
-              <a
-                href={PDF_LANDING_URL}
-                class="text-ui text-body no-underline hover:text-ink">व्याकरण PDF</a
+              <a href={PDF_LANDING_URL} class="text-ui text-body no-underline hover:text-ink"
+                ><span class="latin text-faint">(Grammar PDF)</span> व्याकरण PDF</a
               >
             </li>
             <li>
-              <a href="/parichay/" class="text-ui text-body no-underline hover:text-ink">परिचय</a>
+              <a href="/parichay/" class="text-ui text-body no-underline hover:text-ink"
+                ><span class="latin text-faint">(Introduction)</span> परिचय</a
+              >
             </li>
             <li>
               <a href="/sitemap-index.xml" class="text-ui text-body no-underline hover:text-ink"
-                >साइटमैप</a
+                ><span class="latin text-faint">(Sitemap)</span> साइटमैप</a
               >
             </li>
           </ul>
@@ -84,7 +87,7 @@ const year = new Date().getFullYear();
               sitePages.map((page) => (
                 <li>
                   <a href={page.href} class="text-ui text-body no-underline hover:text-ink">
-                    {page.label}
+                    <span class="latin text-faint">({page.labelEn})</span> {page.label}
                   </a>
                 </li>
               ))
