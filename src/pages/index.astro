@@ -1,7 +1,9 @@
 ---
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import CompletePdfCta from '../components/CompletePdfCta.astro';
 import DownloadIcon from '../components/DownloadIcon.astro';
+import heroImage from '../assets/hero-hindi-vyakaran.png';
 import { categories, plannedTopics, levels } from '../lib/taxonomy';
 import { getAllTopics, topicUrl } from '../lib/content';
 import { PDF_LANDING_URL } from '../lib/pdf';
@@ -167,35 +169,45 @@ const schema = [
   */}
   <section class="border-b border-hairline">
     <div class="mx-auto max-w-6xl px-4 py-8 md:py-12">
-      <div class="max-w-3xl">
-        <p class="eyebrow text-accent">संदर्भ · अध्ययन · अभ्यास</p>
+      <div class="grid items-center gap-10 lg:grid-cols-[1.1fr_1fr]">
+        <div class="max-w-3xl">
+          <p class="eyebrow text-accent">संदर्भ · अध्ययन · अभ्यास</p>
 
-        {/* The H1 carries the head term in both scripts. A reader typing
-            "hindi vyakaran" and a reader typing "हिंदी व्याकरण" are the
-            same reader, and the page has to answer to both spellings. */}
-        <h1 class="mt-4 text-h1 font-bold text-ink md:text-[3.25rem] md:leading-[1.25]">
-          <span class="latin">Hindi Vyakaran</span> |<br class="hidden sm:block" /> सीखें सम्पूर्ण हिंदी
-          व्याकरण
-        </h1>
+          {/* The H1 carries the head term in both scripts. A reader typing
+              "hindi vyakaran" and a reader typing "हिंदी व्याकरण" are the
+              same reader, and the page has to answer to both spellings. */}
+          <h1 class="mt-4 text-h1 font-bold text-ink md:text-[3.25rem] md:leading-[1.25]">
+            <span class="latin">Hindi Vyakaran</span> |<br class="hidden sm:block" /> सीखें सम्पूर्ण हिंदी
+            व्याकरण
+          </h1>
 
-        <p class="mt-6 max-w-2xl text-lead text-body">
-          {categories.length} खंड, {topics.length} विषय — परिभाषा, भेद, उदाहरण और अभ्यास, सब कुछ सरल
-          हिंदी में। पूरी <span class="latin">Hindi grammar book</span> PDF में मुफ़्त डाउनलोड भी करें।
-        </p>
+          <p class="mt-6 max-w-2xl text-lead text-body">
+            {categories.length} खंड, {topics.length} विषय — परिभाषा, भेद, उदाहरण और अभ्यास, सब कुछ सरल
+            हिंदी में। पूरी <span class="latin">Hindi grammar book</span> PDF में मुफ़्त डाउनलोड भी करें।
+          </p>
 
-        {/* Routed to /pdf/ rather than straight at the file. A reader in
-            the hero has not chosen between the whole book and one topic
-            yet, and firing a 3.7 MB download at someone who wanted
-            संधि is the wrong default — the landing page offers both. */}
-        <div class="mt-7">
-          <a
-            href={PDF_LANDING_URL}
-            class="inline-flex items-center gap-2.5 rounded-pill bg-accent px-5 py-3 text-ui font-semibold text-white no-underline transition-colors hover:bg-accent-deep"
-          >
-            <DownloadIcon class="size-4" />
-            Download PDF
-          </a>
+          {/* Routed to /pdf/ rather than straight at the file. A reader in
+              the hero has not chosen between the whole book and one topic
+              yet, and firing a 3.7 MB download at someone who wanted
+              संधि is the wrong default — the landing page offers both. */}
+          <div class="mt-7">
+            <a
+              href={PDF_LANDING_URL}
+              class="inline-flex items-center gap-2.5 rounded-pill bg-accent px-5 py-3 text-ui font-semibold text-white no-underline transition-colors hover:bg-accent-deep"
+            >
+              <DownloadIcon class="size-4" />
+              Download PDF
+            </a>
+          </div>
         </div>
+
+        <Image
+          src={heroImage}
+          alt="हिंदी व्याकरण की किताबों का चित्रण — संज्ञा, सर्वनाम, विशेषण, क्रिया सहित"
+          class="hidden w-full rounded-card lg:block"
+          widths={[400, 800, 1671]}
+          sizes="(min-width: 1024px) 40vw, 100vw"
+        />
       </div>
     </div>
   </section>
