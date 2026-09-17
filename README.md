@@ -1,8 +1,4 @@
-# हिंदी व्याकरण — hindivyakaran.net
-
-A Hindi grammar reference site. Hindi (Devanagari) is the site language;
-English appears only in URLs, code, metadata and the occasional
-parenthetical gloss.
+# हिंदी व्याकरण
 
 Built with Astro 7 (static), Tailwind CSS v4, MDX content collections.
 
@@ -27,6 +23,13 @@ npm run check    # astro check — types and template diagnostics
 needs a Chrome or Chromium on the machine (see **PDFs** below). Use
 `npm run build:no-pdf` on a box without one — the site builds, but every
 download link 404s.
+
+## Deployment
+
+```
+npx wrangler login
+npx wrangler pages deploy ./dist --project-name=hindi-vyakaran
+```
 
 ## How content is organised
 
@@ -58,15 +61,15 @@ shipping silently.
 
 ```mdx
 ---
-title: कारक                      # Devanagari, used everywhere
-titleEn: Case                    # dim Latin subtitle + a search key
-category: shabd-vichar           # must be one of the seven khand ids
-order: 6                         # position within the khand
-summary: …                       # ONE line — cards, search, meta description
-definition: …                    # the formal परिभाषा, rendered in a box at top
-level: madhyam                   # aadhar | madhyam | unnat — depth, not audience
-keywords: [कारक, विभक्ति, karak]  # extra search terms, both scripts
-related: [sangya, kriya]         # slugs — renders as सम्बंधित विषय
+title: कारक # Devanagari, used everywhere
+titleEn: Case # dim Latin subtitle + a search key
+category: shabd-vichar # must be one of the seven khand ids
+order: 6 # position within the khand
+summary: … # ONE line — cards, search, meta description
+definition: … # the formal परिभाषा, rendered in a box at top
+level: madhyam # aadhar | madhyam | unnat — depth, not audience
+keywords: [कारक, विभक्ति, karak] # extra search terms, both scripts
+related: [sangya, kriya] # slugs — renders as सम्बंधित विषय
 updated: 2026-09-15
 ---
 ```
@@ -80,13 +83,13 @@ reference sites read like blogs.
 
 No imports needed — they are injected by the topic route.
 
-| Component | Use |
-| --- | --- |
-| `<Paribhasha>` | Definition box. The page renders one automatically from frontmatter; only add another for a nested definition. |
-| `<Udaharan items={[…]} />` | Example chips for word lists. |
-| `<Udaharan label="वाक्य में">` | Example block for full sentences (slot form). |
-| `<Dhyan>` | "ध्यान दें" — exceptions and confusable pairs. |
-| `<Abhyas>` / `<Prashn q="" a="" />` | Practice questions with reveal-on-demand answers. |
+| Component                           | Use                                                                                                            |
+| ----------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `<Paribhasha>`                      | Definition box. The page renders one automatically from frontmatter; only add another for a nested definition. |
+| `<Udaharan items={[…]} />`          | Example chips for word lists.                                                                                  |
+| `<Udaharan label="वाक्य में">`      | Example block for full sentences (slot form).                                                                  |
+| `<Dhyan>`                           | "ध्यान दें" — exceptions and confusable pairs.                                                                 |
+| `<Abhyas>` / `<Prashn q="" a="" />` | Practice questions with reveal-on-demand answers.                                                              |
 
 **Write भेद as Markdown `###` headings, not as components.** Only real
 Markdown headings reach `render()`'s `headings` array, which feeds the
@@ -121,15 +124,15 @@ in. So the accent family DESIGN.md names — link blue, cyan, violet,
 magenta, warning amber — is kept but **reassigned from decoration to
 wayfinding**: each खंड owns one colour.
 
-| खंड | Colour | DESIGN.md source |
-| --- | --- | --- |
-| भाषा और व्याकरण | `#1d4ed8` blue | link |
-| वर्ण विचार | `#0f766e` teal | cyan |
-| शब्द विचार | `#6d28d9` violet | violet |
-| वाक्य विचार | `#a21caf` plum | magenta |
-| शब्द भंडार | `#8f5a06` ochre | warning |
-| काव्य और अलंकार | `#be123c` rose | pink |
-| रचना | `#166534` green | — |
+| खंड             | Colour           | DESIGN.md source |
+| --------------- | ---------------- | ---------------- |
+| भाषा और व्याकरण | `#1d4ed8` blue   | link             |
+| वर्ण विचार      | `#0f766e` teal   | cyan             |
+| शब्द विचार      | `#6d28d9` violet | violet           |
+| वाक्य विचार     | `#a21caf` plum   | magenta          |
+| शब्द भंडार      | `#8f5a06` ochre  | warning          |
+| काव्य और अलंकार | `#be123c` rose   | pink             |
+| रचना            | `#166534` green  | —                |
 
 All seven clear WCAG AA (≥4.5:1) on surface, canvas and their own soft
 tint, in both themes.
@@ -177,7 +180,7 @@ does string comparisons:
   people actually spell Hindi in Latin letters (`sangya`, not `saṃjñā`),
   including final-schwa deletion. A large share of users type romanised
   Hindi because switching IME mid-search is friction they won't accept.
-- **Consonant skeleton** — vowels removed, to absorb *medial* schwa
+- **Consonant skeleton** — vowels removed, to absorb _medial_ schwa
   deletion (`upsarg` vs `upasarg`). High recall, low precision, so it is
   ranked strictly below the other two in `src/lib/search.ts`.
 
@@ -248,7 +251,7 @@ Three things are easy to break here:
 - **Heading line-heights are opened up in `PrintLayout`** (1.75/1.85).
   Devanagari ink overflows the line boxes the heading scale gives it,
   which is invisible on screen but strands a 2px crescent of a शिरोरेखा
-  at the foot of the *previous* page once Chrome starts fragmenting.
+  at the foot of the _previous_ page once Chrome starts fragmenting.
   Same file undoes `display: block` on tables — that rule exists so
   tables scroll sideways on phones, and paper does not scroll.
 
