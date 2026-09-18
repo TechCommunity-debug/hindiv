@@ -15,6 +15,8 @@ interface Props {
    */
   image?: string;
   imageAlt?: string;
+  imageWidth?: number;
+  imageHeight?: number;
   /** og:type — 'website' for listings, 'article' for topic pages. */
   ogType?: string;
   /**
@@ -32,6 +34,8 @@ const {
   noindex = false,
   image = OG_IMAGE,
   imageAlt = OG_IMAGE_ALT,
+  imageWidth = 1672,
+  imageHeight = 941,
   ogType = 'website',
   keywords = SITE_KEYWORDS,
 } = Astro.props;
@@ -78,8 +82,8 @@ const schemas = schema ? (Array.isArray(schema) ? schema : [schema]) : [];
 <meta property="og:image" content={ogImage} />
 <meta property="og:image:secure_url" content={ogImage} />
 <meta property="og:image:type" content="image/png" />
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="630" />
+<meta property="og:image:width" content={String(imageWidth)} />
+<meta property="og:image:height" content={String(imageHeight)} />
 <meta property="og:image:alt" content={imageAlt} />
 
 {/* summary_large_image, not summary: the card is a 1.91:1 render built for

@@ -1,9 +1,6 @@
 ---
-import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import CompletePdfCta from '../components/CompletePdfCta.astro';
-import DownloadIcon from '../components/DownloadIcon.astro';
-import heroImage from '../assets/hero-hindi-vyakaran.png';
 import { categories, plannedTopics, levels } from '../lib/taxonomy';
 import { getAllTopics, topicUrl } from '../lib/content';
 import { PDF_LANDING_URL } from '../lib/pdf';
@@ -18,7 +15,7 @@ const totalPlanned = topics.length + plannedTopics.length;
  * variants are carried mainly by /pdf/, and appear here only because a
  * home page that never says the word cannot rank for it either.
  */
-const title = 'Hindi Vyakaran — हिंदी व्याकरण | Hindi Grammar PDF Download';
+const title = 'Hindi Vyakaran — सीखें सम्पूर्ण हिंदी व्याकरण | Hindi Grammar';
 const description =
   `हिंदी व्याकरण (Hindi Vyakaran) का सम्पूर्ण निःशुल्क संदर्भ — ${categories.length} खंड, ${topics.length} विषय, ` +
   'परिभाषा, भेद, उदाहरण और अभ्यास सहित। पूरी Hindi grammar book PDF भी मुफ़्त डाउनलोड करें।';
@@ -183,30 +180,17 @@ const schema = [
 
           <p class="mt-6 max-w-2xl text-lead text-body">
             {categories.length} खंड, {topics.length} विषय — परिभाषा, भेद, उदाहरण और अभ्यास, सब कुछ सरल
-            हिंदी में। पूरी <span class="latin">Hindi grammar book</span> PDF में मुफ़्त डाउनलोड भी करें।
+            हिंदी में।
           </p>
-
-          {/* Routed to /pdf/ rather than straight at the file. A reader in
-              the hero has not chosen between the whole book and one topic
-              yet, and firing a 3.7 MB download at someone who wanted
-              संधि is the wrong default — the landing page offers both. */}
-          <div class="mt-7">
-            <a
-              href={PDF_LANDING_URL}
-              class="inline-flex items-center gap-2.5 rounded-pill bg-accent px-5 py-3 text-ui font-semibold text-white no-underline transition-colors hover:bg-accent-deep"
-            >
-              <DownloadIcon class="size-4" />
-              Download PDF
-            </a>
-          </div>
         </div>
 
-        <Image
-          src={heroImage}
+        <img
+          src="/og.png"
           alt="हिंदी व्याकरण की किताबों का चित्रण — संज्ञा, सर्वनाम, विशेषण, क्रिया सहित"
           class="hidden w-full rounded-card lg:block"
-          widths={[400, 800, 1671]}
-          sizes="(min-width: 1024px) 40vw, 100vw"
+          width="1672"
+          height="941"
+          loading="eager"
         />
       </div>
     </div>
@@ -257,7 +241,7 @@ const schema = [
                   <li class="list-none">
                     <a
                       href={topicUrl(topic)}
-                      class="group flex items-baseline gap-x-3 rounded-control bg-(--khand-soft) px-3.5 py-2.5 no-underline transition-colors hover:bg-(--khand)"
+                      class="group flex items-baseline gap-x-3 rounded-control bg-(--khand-soft) px-3.5 py-2.5 no-underline transition-colors [-webkit-tap-highlight-color:transparent] hover:bg-(--khand)"
                     >
                       <span
                         class="w-5 shrink-0 font-mono text-meta tabular-nums text-(--khand) transition-colors group-hover:text-canvas"
@@ -268,11 +252,19 @@ const schema = [
                       <span class="font-serif text-h3 font-semibold text-ink transition-colors group-hover:text-canvas">
                         {topic.data.title}
                       </span>
-                      <span class="hidden text-h3 text-ink transition-colors group-hover:text-canvas latin sm:inline">
+                      <span class="text-meta text-ink transition-colors group-hover:text-canvas latin sm:text-h3">
                         ({topic.data.titleEn})
                       </span>
                       <span class="ml-auto shrink-0 text-meta text-mute transition-colors group-hover:text-canvas/75">
                         {levels[topic.data.level].label}
+                      </span>
+                      <span
+                        class="flex size-6 shrink-0 items-center justify-center rounded-full bg-(--khand)/15 text-(--khand) transition-colors group-hover:bg-canvas/25 group-hover:text-canvas"
+                        aria-hidden="true"
+                      >
+                        <svg class="size-3.5" viewBox="0 0 20 20" fill="none">
+                          <path d="m8 5 5 5-5 5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
                       </span>
                     </a>
                   </li>
@@ -571,6 +563,6 @@ const schema = [
       "all of it in one file" means something, and it is too late to be
       useful at the top of the page. */}
   <section class="mx-auto max-w-6xl px-4 pt-14 pb-4 md:pt-20">
-    <CompletePdfCta />
+    <CompletePdfCta linkToLanding />
   </section>
 </BaseLayout>

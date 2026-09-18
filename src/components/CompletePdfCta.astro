@@ -2,7 +2,7 @@
 import DownloadIcon from './DownloadIcon.astro';
 import { categories } from '../lib/taxonomy';
 import { getAllTopics } from '../lib/content';
-import { COMPLETE_PDF_URL, COMPLETE_PDF_FILENAME } from '../lib/pdf';
+import { COMPLETE_PDF_URL, COMPLETE_PDF_FILENAME, PDF_LANDING_URL } from '../lib/pdf';
 
 /**
  * The complete-book download block.
@@ -18,13 +18,20 @@ import { COMPLETE_PDF_URL, COMPLETE_PDF_FILENAME } from '../lib/pdf';
  * in their document outline — h2 under the landing page's h1, h2 on the
  * home page too, but the prop keeps that a decision of the caller
  * rather than an assumption baked in here.
+ *
+ * `linkToLanding` swaps the button from an immediate download to a
+ * link at /pdf/ instead — the home page uses this, since a reader who
+ * hasn't seen the dedicated landing page yet should land there first,
+ * rather than get a file with no context. The landing page itself keeps
+ * the direct download, since that context is already on screen.
  */
 interface Props {
   headingLevel?: 'h2' | 'h3';
   class?: string;
+  linkToLanding?: boolean;
 }
 
-const { headingLevel: Heading = 'h2', class: className } = Astro.props;
+const { headingLevel: Heading = 'h2', class: className, linkToLanding = false } = Astro.props;
 
 const topics = await getAllTopics();
 const headingId = 'complete-pdf-heading';
@@ -48,8 +55,8 @@ const headingId = 'complete-pdf-heading';
 
   <div class="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
     <a
-      href={COMPLETE_PDF_URL}
-      download={COMPLETE_PDF_FILENAME}
+      href={linkToLanding ? PDF_LANDING_URL : COMPLETE_PDF_URL}
+      download={linkToLanding ? undefined : COMPLETE_PDF_FILENAME}
       class="inline-flex items-center gap-2.5 rounded-pill bg-accent px-6 py-3.5 text-lead font-semibold text-white no-underline transition-colors hover:bg-accent-deep"
     >
       <DownloadIcon class="size-5" />

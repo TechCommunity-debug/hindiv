@@ -13,14 +13,13 @@ export const SITE_URL = 'https://hindivyakaran.net';
 export const CONTACT_EMAIL = 'techcommunity611@gmail.com';
 
 /**
- * The default share card. Built by scripts/generate-og.mjs and committed,
- * rather than rendered per request: it changes about as often as the site
- * name does, and a crawler fetching it must never wait on a function.
+ * The default share card, committed rather than rendered per request: it
+ * changes rarely, and a crawler fetching it must never wait on a function.
  *
  * 1200×630 is the size Facebook, LinkedIn and X all crop from without
  * letterboxing, and the one the og:image:width/height below must match.
  */
-export const OG_IMAGE = '/og-image.png';
+export const OG_IMAGE = '/og.png';
 
 export const OG_IMAGE_ALT =
   'Hindi Vyakaran — हिंदी व्याकरण का सम्पूर्ण ऑनलाइन संदर्भ और मुफ़्त PDF';

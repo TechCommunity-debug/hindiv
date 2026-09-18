@@ -99,20 +99,33 @@ const schema = [
   <div class="mx-auto max-w-5xl px-4 py-8 md:py-12">
     <Breadcrumbs items={[{ label: 'Hindi Vyakaran PDF' }]} />
 
-    <header class="mt-5">
-      <p class="eyebrow text-accent">डाउनलोड · मुफ़्त · बिना पंजीकरण</p>
+    <header class="mt-5 grid items-center gap-10 lg:grid-cols-[1.1fr_1fr]">
+      <div>
+        <p class="eyebrow text-accent">डाउनलोड · मुफ़्त · बिना पंजीकरण</p>
 
-      {/* The exact-match H1. Latin first because that is the typed
-          query; the Devanagari restates it for the reader who is
-          actually here to read. */}
-      <h1 class="mt-3 text-h1 font-bold text-ink md:text-display">
-        <span class="latin">Hindi Vyakaran PDF</span> — हिंदी व्याकरण PDF
-      </h1>
+        {/* The exact-match H1. Latin first because that is the typed
+            query; the Devanagari restates it for the reader who is
+            actually here to read. */}
+        <h1 class="mt-3 text-h1 font-bold text-ink md:text-display">
+          <span class="latin">Hindi Vyakaran PDF</span> — हिंदी व्याकरण PDF
+        </h1>
 
-      <p class="mt-5 max-w-2xl text-lead text-body">
-        पूरा हिंदी व्याकरण PDF में डाउनलोड करें — सात खंड, {topics.length} विषय, परिभाषा, भेद,
-        उदाहरण और अभ्यास सहित। नीचे किसी भी एक विषय की अलग PDF भी ले सकते हैं।
-      </p>
+        <p class="mt-5 max-w-2xl text-lead text-body">
+          पूरा हिंदी व्याकरण PDF में डाउनलोड करें — सात खंड, {topics.length} विषय, परिभाषा, भेद,
+          उदाहरण और अभ्यास सहित। नीचे किसी भी एक विषय की अलग PDF भी ले सकते हैं।
+        </p>
+      </div>
+
+      {/* Same slot as the home page hero — see index.astro — carrying
+          the PDF-specific card instead of the site-wide one. */}
+      <img
+        src="/og-pdf.png"
+        alt="हिंदी व्याकरण PDF का मुखपृष्ठ चित्रण"
+        class="hidden w-full rounded-card lg:block"
+        width="1672"
+        height="941"
+        loading="eager"
+      />
     </header>
 
     {/* The primary call to action. One button, above everything else,

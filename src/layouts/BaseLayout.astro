@@ -13,11 +13,14 @@ interface Props {
   /** Share card and social metadata — see Seo.astro for the defaults. */
   image?: string;
   imageAlt?: string;
+  imageWidth?: number;
+  imageHeight?: number;
   ogType?: string;
   keywords?: string;
 }
 
-const { title, description, schema, noindex, image, imageAlt, ogType, keywords } = Astro.props;
+const { title, description, schema, noindex, image, imageAlt, imageWidth, imageHeight, ogType, keywords } =
+  Astro.props;
 ---
 
 <!doctype html>
@@ -42,6 +45,8 @@ const { title, description, schema, noindex, image, imageAlt, ogType, keywords }
       noindex={noindex}
       image={image}
       imageAlt={imageAlt}
+      imageWidth={imageWidth}
+      imageHeight={imageHeight}
       ogType={ogType}
       keywords={keywords}
     />
