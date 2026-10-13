@@ -51,13 +51,17 @@ const schema = [
     description,
     inLanguage: 'hi',
     url: abs(PDF_LANDING_URL),
-    mainEntity: {
-      '@type': 'DataDownload',
-      name: 'सम्पूर्ण हिंदी व्याकरण PDF',
-      encodingFormat: 'application/pdf',
-      contentUrl: abs(COMPLETE_PDF_URL),
-      inLanguage: 'hi',
-    },
+    ...(!import.meta.env.PROD
+      ? {
+          mainEntity: {
+            '@type': 'DataDownload',
+            name: 'सम्पूर्ण हिंदी व्याकरण PDF',
+            encodingFormat: 'application/pdf',
+            contentUrl: abs(COMPLETE_PDF_URL),
+            inLanguage: 'hi',
+          },
+        }
+      : {}),
   },
   {
     '@context': 'https://schema.org',
@@ -131,7 +135,7 @@ const schema = [
     {/* The primary call to action. One button, above everything else,
         for the reader who came for the whole book and nothing else.
         Shared with the home page — see CompletePdfCta. */}
-    <CompletePdfCta class="mt-8" />
+    {!import.meta.env.PROD && <CompletePdfCta class="mt-8" />}
 
     {/* Per-topic downloads, grouped exactly as the home page groups the
         contents — a reader who knows the site can find संधि here without

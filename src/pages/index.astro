@@ -1,9 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import CompletePdfCta from '../components/CompletePdfCta.astro';
 import { categories, plannedTopics, levels } from '../lib/taxonomy';
 import { getAllTopics, topicUrl } from '../lib/content';
-import { PDF_LANDING_URL } from '../lib/pdf';
 import { CONTACT_EMAIL, sitePages, SITE_URL } from '../lib/site';
 
 const topics = await getAllTopics();
@@ -442,26 +440,6 @@ const schema = [
           "तत्सम" का अर्थ क्या है।
         </p>
 
-        <h3>Hindi Vyakaran PDF — पूरी किताब एक फ़ाइल में</h3>
-
-        <p>
-          पढ़ाई हमेशा ऑनलाइन नहीं होती, इसलिए यहाँ की सारी सामग्री <strong
-            ><span class="latin">Hindi vyakaran PDF</span></strong
-          > के रूप में भी उपलब्ध है। <a href={PDF_LANDING_URL}>PDF पृष्ठ</a> से पूरी <span
-            class="latin">hindi grammar book PDF</span
-          > एक ही फ़ाइल में डाउनलोड की जा सकती है, जिसमें सातों खंड और सभी {topics.length} विषय अपने क्रम
-          में हैं। जिसे पूरी किताब नहीं चाहिए, वह किसी एक विषय की अलग PDF भी उसी पृष्ठ से ले सकता है —
-          संधि, समास, अलंकार या कोई भी और विषय।
-        </p>
-
-        <p>
-          ये फ़ाइलें A4 आकार में, छापने योग्य बनी हैं और देवनागरी फ़ॉन्ट फ़ाइल के भीतर ही सम्मिलित है,
-          इसलिए किसी भी फ़ोन या कंप्यूटर पर अक्षर सही दिखते हैं। अभ्यास-प्रश्नों के उत्तर PDF में साथ
-          दिए गए हैं, और वेबसाइट पर सामग्री बदलने पर PDF भी हर बार नए सिरे से बनती है — यानी{' '}
-          <span class="latin">hindi vyakaran pdf download</span> करने पर वही मिलता है जो इस समय वेबसाइट
-          पर है, कोई पुरानी प्रति नहीं। इन सबका कोई शुल्क नहीं है।
-        </p>
-
         <h3>यह संदर्भ किनके लिए है</h3>
 
         <p>
@@ -558,11 +536,4 @@ const schema = [
     </div>
   </section>
 
-  {/* Last thing before the footer. A reader who has scrolled the whole
-      contents list has seen the scope of the work — that is the moment
-      "all of it in one file" means something, and it is too late to be
-      useful at the top of the page. */}
-  <section class="mx-auto max-w-6xl px-4 pt-14 pb-4 md:pt-20">
-    <CompletePdfCta linkToLanding />
-  </section>
 </BaseLayout>
