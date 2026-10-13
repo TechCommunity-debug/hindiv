@@ -30,3 +30,6 @@ pnpm-debug.log*
 #   python3 .agents/skills/tailwind-4-docs/scripts/sync_tailwind_docs.py --accept-docs-license
 .agents/skills/tailwind-4-docs/references/docs/
 .agents/skills/tailwind-4-docs/references/docs-index.tsx
+
+# Local MCQ working files — kept out of the build and version control.
+mcq/
