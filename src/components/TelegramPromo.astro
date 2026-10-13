@@ -1,0 +1,120 @@
+---
+/**
+ * Telegram Channel Promotion Banner / Card
+ *
+ * Promotes the official second Telegram channel (@HindiGrammarMCQs)
+ * for Hindi grammar MCQs and regular practice questions.
+ * Designed with a clean, trustworthy aesthetic matching the site,
+ * responsive and touch-friendly for Indian competitive exam aspirants.
+ */
+
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+const TELEGRAM_URL = 'https://t.me/HindiGrammarMCQs';
+const CHANNEL_HANDLE = '@HindiGrammarMCQs';
+---
+
+<aside
+  class:list={[
+    'telegram-promo not-prose rounded-card border border-hairline bg-surface p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.03)] transition-colors print:hidden',
+    className,
+  ]}
+  aria-labelledby="telegram-promo-heading"
+>
+  <div class="flex flex-col gap-4">
+    {/* Header with Title and Channel Handle Badge */}
+    <div class="flex flex-wrap items-center justify-between gap-2.5">
+      <h3
+        id="telegram-promo-heading"
+        class="m-0 flex items-center gap-2 font-serif text-h3 font-bold text-ink"
+      >
+        <span>Join Our Telegram Channel for more MCQs📚</span>
+      </h3>
+      <span
+        class="inline-flex items-center gap-1.5 rounded-pill border border-[#229ED9]/25 bg-[#229ED9]/10 px-2.5 py-0.5 text-meta font-medium text-[#1378aa] dark:text-[#5bc4f5] latin"
+        title="Official Telegram Channel"
+      >
+        <span class="size-1.5 rounded-full bg-[#229ED9]" aria-hidden="true"></span>
+        {CHANNEL_HANDLE}
+      </span>
+    </div>
+
+    {/* Friendly & Trustworthy Message */}
+    <div class="space-y-1.5 text-ui text-body">
+      <p class="m-0 leading-relaxed">
+        For more Hindi Vyakaran MCQs, practice questions, join our Telegram channel.
+      </p>
+      <p class="m-0 text-mute leading-relaxed">
+        We are sharing more Hindi grammar questions to help you practice regularly.
+      </p>
+    </div>
+
+    {/* Action Area: Telegram-Blue Button & Trust Signal */}
+    <div class="mt-1 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <a
+        href={TELEGRAM_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="group inline-flex min-h-[46px] w-full items-center justify-center gap-2.5 rounded-pill bg-[#229ED9] px-6 py-3 text-ui font-semibold text-white no-underline shadow-sm transition-all hover:bg-[#1d8bc1] hover:shadow active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#229ED9] sm:w-auto"
+      >
+        {/* Telegram Paper Airplane SVG Icon */}
+        <svg
+          class="size-5 shrink-0 transition-transform duration-200 group-hover:scale-110"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            d="m20.665 3.717-17.73 6.837c-1.21.486-1.203 1.161-.222 1.462l4.552 1.42 10.532-6.645c.498-.303.953-.14.579.192l-8.533 7.701h-.002l-.002.001-.314 4.692c.46 0 .663-.211.921-.46l2.211-2.15 4.599 3.397c.848.467 1.457.227 1.668-.785l3.019-14.228c.309-1.239-.473-1.8-1.282-1.434z"
+          />
+        </svg>
+        <span>Join Our Channel on Telegram</span>
+        {/* External Link Arrow */}
+        <svg
+          class="size-4 shrink-0 opacity-80 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+          viewBox="0 0 16 16"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M4 12L12 4H6M12 4V10"
+            stroke="currentColor"
+            stroke-width="1.75"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </a>
+
+      {/* Trust reassurance for Indian students */}
+      <p class="m-0 flex items-center gap-1.5 text-meta text-mute">
+        <svg
+          class="size-4 shrink-0 text-[#229ED9]"
+          viewBox="0 0 16 16"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M13.333 4 6 11.333 2.667 8"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <span>निःशुल्क अभ्यास · Direct Telegram link</span>
+      </p>
+    </div>
+  </div>
+</aside>
+
+<style>
+  @media print {
+    .telegram-promo {
+      display: none !important;
+    }
+  }
+</style>

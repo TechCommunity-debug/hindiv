@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { categories, plannedTopics, levels } from '../lib/taxonomy';
 import { getAllTopics, topicUrl } from '../lib/content';
 import { CONTACT_EMAIL, sitePages, SITE_URL } from '../lib/site';
+import TelegramPromo from '../components/TelegramPromo.astro';
 
 const topics = await getAllTopics();
 const totalPlanned = topics.length + plannedTopics.length;
@@ -288,6 +289,10 @@ const schema = [
           </section>
         ))
       }
+    </div>
+
+    <div class="mt-10">
+      <TelegramPromo />
     </div>
   </section>
 
