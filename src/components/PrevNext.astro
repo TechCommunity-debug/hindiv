@@ -20,10 +20,37 @@ const { prev, next } = Astro.props;
           href={topicUrl(prev)}
           rel="prev"
           data-khand={prev.data.category}
-          class="rounded-card border border-hairline bg-surface p-4 no-underline transition-colors hover:border-(--khand) hover:bg-(--khand-soft)"
+          class="group flex items-center gap-3.5 rounded-card border border-hairline bg-surface p-4 no-underline transition-colors hover:border-(--khand) hover:bg-(--khand-soft)"
         >
-          <span class="eyebrow text-(--khand)">पिछला</span>
-          <span class="mt-1 block font-serif text-h3 font-semibold text-ink">{prev.data.title}</span>
+          <span
+            class="flex size-9 shrink-0 items-center justify-center rounded-full bg-(--khand)/15 text-(--khand) transition-all group-hover:bg-(--khand) group-hover:text-canvas"
+            aria-hidden="true"
+          >
+            <svg
+              class="size-4 transition-transform group-hover:-translate-x-0.5"
+              viewBox="0 0 20 20"
+              fill="none"
+            >
+              <path
+                d="m12 5-5 5 5 5"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </span>
+          <div class="min-w-0 flex-1">
+            <span class="eyebrow text-(--khand)">
+              पिछला <span class="latin font-normal normal-case">(Back)</span>
+            </span>
+            <span class="mt-1 block font-serif text-h3 font-semibold text-ink">
+              {prev.data.title}{' '}
+              <span class="latin text-base font-normal text-mute">
+                ({prev.data.titleEn})
+              </span>
+            </span>
+          </div>
         </a>
       ) : (
         <span />
@@ -34,10 +61,37 @@ const { prev, next } = Astro.props;
           href={topicUrl(next)}
           rel="next"
           data-khand={next.data.category}
-          class="rounded-card border border-hairline bg-surface p-4 text-right no-underline transition-colors hover:border-(--khand) hover:bg-(--khand-soft) sm:col-start-2"
+          class="group flex items-center justify-between gap-3.5 rounded-card border border-hairline bg-surface p-4 text-right no-underline transition-colors hover:border-(--khand) hover:bg-(--khand-soft) sm:col-start-2"
         >
-          <span class="eyebrow text-(--khand)">अगला</span>
-          <span class="mt-1 block font-serif text-h3 font-semibold text-ink">{next.data.title}</span>
+          <div class="min-w-0 flex-1">
+            <span class="eyebrow text-(--khand)">
+              अगला <span class="latin font-normal normal-case">(Next)</span>
+            </span>
+            <span class="mt-1 block font-serif text-h3 font-semibold text-ink">
+              {next.data.title}{' '}
+              <span class="latin text-base font-normal text-mute">
+                ({next.data.titleEn})
+              </span>
+            </span>
+          </div>
+          <span
+            class="flex size-9 shrink-0 items-center justify-center rounded-full bg-(--khand)/15 text-(--khand) transition-all group-hover:bg-(--khand) group-hover:text-canvas"
+            aria-hidden="true"
+          >
+            <svg
+              class="size-4 transition-transform group-hover:translate-x-0.5"
+              viewBox="0 0 20 20"
+              fill="none"
+            >
+              <path
+                d="m8 5 5 5-5 5"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </span>
         </a>
       )}
     </nav>
