@@ -1,0 +1,158 @@
+---
+/**
+ * TelegramPdfBanner.astro
+ *
+ * Big, high-converting banner/section specifically for /pdf page.
+ * Promotes the Telegram channel (@HindiGrammarMCQs) for regular
+ * practice questions, daily quizzes, and study material updates.
+ */
+
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+const TELEGRAM_URL = 'https://t.me/HindiGrammarMCQs';
+const CHANNEL_HANDLE = '@HindiGrammarMCQs';
+---
+
+<section
+  class:list={[
+    'telegram-pdf-banner not-prose rounded-panel border border-[#229ED9]/30 bg-gradient-to-br from-surface via-[#229ED9]/[0.05] to-[#229ED9]/[0.10] p-6 sm:p-8 md:p-9 shadow-[0_2px_12px_rgba(34,158,217,0.06)] transition-colors print:hidden',
+    className,
+  ]}
+  aria-labelledby="telegram-pdf-heading"
+>
+  <div class="flex flex-col gap-6">
+    {/* Header & Badges */}
+    <div>
+      <div class="flex flex-wrap items-center gap-2.5">
+        <span
+          class="inline-flex items-center gap-1.5 rounded-pill border border-[#229ED9]/30 bg-[#229ED9]/10 px-3 py-1 text-meta font-medium text-[#1378aa] dark:text-[#5bc4f5] latin"
+        >
+          <span class="size-2 rounded-full bg-[#229ED9] animate-pulse" aria-hidden="true"></span>
+          Official Channel · {CHANNEL_HANDLE}
+        </span>
+        <span class="rounded-pill bg-canvas/70 px-2.5 py-1 text-meta font-medium text-mute">
+          100% निःशुल्क अभ्यास
+        </span>
+      </div>
+
+      <h2
+        id="telegram-pdf-heading"
+        class="m-0 mt-3.5 font-serif text-h2 font-bold text-ink sm:text-[1.85rem]"
+      >
+        हिंदी व्याकरण Daily MCQs, क्विज़ और PDF नोट्स — Telegram से जुड़ें
+      </h2>
+
+      <p class="mt-2.5 max-w-3xl text-lead text-body">
+        प्रतियोगी परीक्षाओं (UPSC, State PCS, SSC, TET/CTET, REET, Police, SI) एवं कक्षा 9वीं–12वीं बोर्ड परीक्षाओं की सर्वश्रेष्ठ तैयारी हेतु हमारे Telegram चैनल से जुड़ें। यहाँ रोज़ाना नए वस्तुनिष्ठ प्रश्न (MCQs) और अभ्यास क्विज़ आयोजित किए जाते हैं।
+      </p>
+    </div>
+
+    {/* Feature Highlights Grid */}
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="flex items-start gap-3 rounded-card border border-hairline bg-surface/90 p-3.5 backdrop-blur-xs">
+        <span class="flex size-8 shrink-0 items-center justify-center rounded-control bg-[#229ED9]/15 text-[#229ED9] text-base" aria-hidden="true">
+          📝
+        </span>
+        <div class="min-w-0">
+          <p class="m-0 text-ui font-semibold text-ink">दैनिक क्विज़ (MCQs)</p>
+          <p class="m-0 mt-0.5 text-meta text-mute">हर रोज़ परीक्षा-स्तरीय नए प्रश्न व तत्काल परिणाम</p>
+        </div>
+      </div>
+
+      <div class="flex items-start gap-3 rounded-card border border-hairline bg-surface/90 p-3.5 backdrop-blur-xs">
+        <span class="flex size-8 shrink-0 items-center justify-center rounded-control bg-[#229ED9]/15 text-[#229ED9] text-base" aria-hidden="true">
+          📚
+        </span>
+        <div class="min-w-0">
+          <p class="m-0 text-ui font-semibold text-ink">मुफ़्त PDF व नोट्स</p>
+          <p class="m-0 mt-0.5 text-meta text-mute">महत्वपूर्ण व्याकरण चार्ट्स, सारिणी व अपडेट्स</p>
+        </div>
+      </div>
+
+      <div class="flex items-start gap-3 rounded-card border border-hairline bg-surface/90 p-3.5 backdrop-blur-xs">
+        <span class="flex size-8 shrink-0 items-center justify-center rounded-control bg-[#229ED9]/15 text-[#229ED9] text-base" aria-hidden="true">
+          🎯
+        </span>
+        <div class="min-w-0">
+          <p class="m-0 text-ui font-semibold text-ink">परीक्षा-उन्मुख तैयारी</p>
+          <p class="m-0 mt-0.5 text-meta text-mute">प्रतियोगी व बोर्ड परीक्षाओं के पिछले वर्षों के प्रश्न</p>
+        </div>
+      </div>
+
+      <div class="flex items-start gap-3 rounded-card border border-hairline bg-surface/90 p-3.5 backdrop-blur-xs">
+        <span class="flex size-8 shrink-0 items-center justify-center rounded-control bg-[#229ED9]/15 text-[#229ED9] text-base" aria-hidden="true">
+          ⚡
+        </span>
+        <div class="min-w-0">
+          <p class="m-0 text-ui font-semibold text-ink">100% निःशुल्क</p>
+          <p class="m-0 mt-0.5 text-meta text-mute">सभी क्विज़ और सामग्री पूरी तरह मुफ़्त</p>
+        </div>
+      </div>
+    </div>
+
+    {/* Primary CTA Button & Trust Indicator */}
+    <div class="flex flex-col items-start gap-4 pt-1 sm:flex-row sm:items-center sm:justify-between">
+      <a
+        href={TELEGRAM_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="group inline-flex min-h-[50px] w-full items-center justify-center gap-2.5 rounded-pill bg-[#229ED9] px-7 py-3 text-lead font-semibold text-white no-underline shadow-sm transition-all hover:bg-[#1d8bc1] hover:shadow-md active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#229ED9] sm:w-auto"
+      >
+        <svg
+          class="size-5 shrink-0 transition-transform duration-200 group-hover:scale-110"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            d="m20.665 3.717-17.73 6.837c-1.21.486-1.203 1.161-.222 1.462l4.552 1.42 10.532-6.645c.498-.303.953-.14.579.192l-8.533 7.701h-.002l-.002.001-.314 4.692c.46 0 .663-.211.921-.46l2.211-2.15 4.599 3.397c.848.467 1.457.227 1.668-.785l3.019-14.228c.309-1.239-.473-1.8-1.282-1.434z"
+          />
+        </svg>
+        <span>Telegram चैनल जॉइन करें — {CHANNEL_HANDLE}</span>
+        <svg
+          class="size-4 shrink-0 opacity-85 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+          viewBox="0 0 16 16"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M4 12L12 4H6M12 4V10"
+            stroke="currentColor"
+            stroke-width="1.75"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </a>
+
+      <p class="m-0 flex items-center gap-2 text-meta text-mute">
+        <svg
+          class="size-4 shrink-0 text-[#229ED9]"
+          viewBox="0 0 16 16"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M13.333 4 6 11.333 2.667 8"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <span>निःशुल्क सदस्यता · सीधे Telegram ऐप में खोलें</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  @media print {
+    .telegram-pdf-banner {
+      display: none !important;
+    }
+  }
+</style>

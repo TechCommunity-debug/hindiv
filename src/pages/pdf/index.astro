@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import CompletePdfCta from '../../components/CompletePdfCta.astro';
+import TelegramPdfBanner from '../../components/TelegramPdfBanner.astro';
 import DownloadIcon from '../../components/DownloadIcon.astro';
 import { categories } from '../../lib/taxonomy';
 import { getAllTopics, topicUrl, categoryUrl } from '../../lib/content';
@@ -136,6 +137,8 @@ const schema = [
         for the reader who came for the whole book and nothing else.
         Shared with the home page — see CompletePdfCta. */}
     {!import.meta.env.PROD && <CompletePdfCta class="mt-8" />}
+
+    <TelegramPdfBanner class="mt-8 sm:mt-10" />
 
     {/* Per-topic downloads, grouped exactly as the home page groups the
         contents — a reader who knows the site can find संधि here without

@@ -4,6 +4,7 @@ import { categories, plannedTopics, levels } from '../lib/taxonomy';
 import { getAllTopics, topicUrl } from '../lib/content';
 import { CONTACT_EMAIL, sitePages, SITE_URL } from '../lib/site';
 import TelegramPromo from '../components/TelegramPromo.astro';
+import TelegramSmallBanner from '../components/TelegramSmallBanner.astro';
 
 const topics = await getAllTopics();
 const totalPlanned = topics.length + plannedTopics.length;
@@ -181,6 +182,8 @@ const schema = [
             {categories.length} खंड, {topics.length} विषय — परिभाषा, भेद, उदाहरण और अभ्यास, सब कुछ सरल
             हिंदी में।
           </p>
+
+          <TelegramSmallBanner class="mt-5 max-w-2xl" />
         </div>
 
         <img

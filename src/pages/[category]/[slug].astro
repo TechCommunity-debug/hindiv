@@ -11,6 +11,7 @@ import Udaharan from '../../components/content/Udaharan.astro';
 import Dhyan from '../../components/content/Dhyan.astro';
 import Abhyas from '../../components/content/Abhyas.astro';
 import Prashn from '../../components/content/Prashn.astro';
+import TelegramSmallBanner from '../../components/TelegramSmallBanner.astro';
 import { getAllTopics, getNeighbours, getRelated, categoryUrl } from '../../lib/content';
 import { getCategory, levels } from '../../lib/taxonomy';
 
@@ -142,6 +143,8 @@ const schema = [
             <span>अंतिम बदलाव <time datetime={updatedIso}>{updatedHi}</time></span>
           </div>
         </header>
+
+        <TelegramSmallBanner topicTitle={title} class="mt-4" />
 
         {/* On-page contents, inline on mobile/tablet where the rail is hidden. */}
         <details class="mt-6 rounded-card border border-hairline bg-surface p-4 xl:hidden">
