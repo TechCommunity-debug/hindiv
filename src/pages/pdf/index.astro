@@ -40,6 +40,13 @@ const description = `हिंदी व्याकरण PDF मुफ़्�
 const abs = (path: string) => new URL(path, Astro.site).href;
 
 /**
+ * Downloads are switched off in production for now: the page there carries
+ * only its heading and the Telegram banner. Local and preview builds keep
+ * the full listing so the files can still be checked.
+ */
+const showDownloads = !import.meta.env.PROD;
+
+/**
  * DataDownload on each entry, not just Article. It is the schema type
  * that says "this page offers a file", and it is what lets the complete
  * download surface as a download rather than as another blue link.
@@ -52,7 +59,7 @@ const schema = [
     description,
     inLanguage: 'hi',
     url: abs(PDF_LANDING_URL),
-    ...(!import.meta.env.PROD
+    ...(showDownloads
       ? {
           mainEntity: {
             '@type': 'DataDownload',
@@ -64,24 +71,28 @@ const schema = [
         }
       : {}),
   },
-  {
-    '@context': 'https://schema.org',
-    '@type': 'ItemList',
-    name: 'हिंदी व्याकरण PDF — विषय सूची',
-    numberOfItems: topics.length,
-    itemListElement: topics.map((topic, i) => ({
-      '@type': 'ListItem',
-      position: i + 1,
-      name: `${topic.data.title} PDF`,
-      item: {
-        '@type': 'DataDownload',
-        name: `${topic.data.title} — हिंदी व्याकरण PDF`,
-        encodingFormat: 'application/pdf',
-        contentUrl: abs(pdfUrl(topic)),
-        inLanguage: 'hi',
-      },
-    })),
-  },
+  ...(showDownloads
+    ? [
+        {
+          '@context': 'https://schema.org',
+          '@type': 'ItemList',
+          name: 'हिंदी व्याकरण PDF — विषय सूची',
+          numberOfItems: topics.length,
+          itemListElement: topics.map((topic, i) => ({
+            '@type': 'ListItem',
+            position: i + 1,
+            name: `${topic.data.title} PDF`,
+            item: {
+              '@type': 'DataDownload',
+              name: `${topic.data.title} — हिंदी व्याकरण PDF`,
+              encodingFormat: 'application/pdf',
+              contentUrl: abs(pdfUrl(topic)),
+              inLanguage: 'hi',
+            },
+          })),
+        },
+      ]
+    : []),
   {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -115,10 +126,16 @@ const schema = [
           <span class="latin">Hindi Vyakaran PDF</span> — हिंदी व्याकरण PDF
         </h1>
 
-        <p class="mt-5 max-w-2xl text-lead text-body">
-          पूरा हिंदी व्याकरण PDF में डाउनलोड करें — सात खंड, {topics.length} विषय, परिभाषा, भेद,
-          उदाहरण और अभ्यास सहित। नीचे किसी भी एक विषय की अलग PDF भी ले सकते हैं।
-        </p>
+        {showDownloads ? (
+          <p class="mt-5 max-w-2xl text-lead text-body">
+            पूरा हिंदी व्याकरण PDF में डाउनलोड करें — सात खंड, {topics.length} विषय, परिभाषा, भेद,
+            उदाहरण और अभ्यास सहित। नीचे किसी भी एक विषय की अलग PDF भी ले सकते हैं।
+          </p>
+        ) : (
+          <p class="mt-5 max-w-2xl text-lead text-body">
+            हिंदी व्याकरण के PDF नोट्स, चार्ट और रोज़ाना MCQs हमारे Telegram चैनल पर मुफ़्त मिलते हैं।
+          </p>
+        )}
       </div>
 
       {/* Same slot as the home page hero — see index.astro — carrying
@@ -136,13 +153,14 @@ const schema = [
     {/* The primary call to action. One button, above everything else,
         for the reader who came for the whole book and nothing else.
         Shared with the home page — see CompletePdfCta. */}
-    {!import.meta.env.PROD && <CompletePdfCta class="mt-8" />}
+    {showDownloads && <CompletePdfCta class="mt-8" />}
 
     <TelegramPdfBanner class="mt-8 sm:mt-10" />
 
     {/* Per-topic downloads, grouped exactly as the home page groups the
         contents — a reader who knows the site can find संधि here without
         re-learning the structure. */}
+    {showDownloads && (
     <section class="mt-14" aria-labelledby="topics-heading">
       <div class="flex flex-wrap items-baseline justify-between gap-3">
         <h2 id="topics-heading" class="m-0 text-h2 font-semibold text-ink">
@@ -206,7 +224,9 @@ const schema = [
         }
       </div>
     </section>
+    )}
 
+    {showDownloads && (
     <section class="mt-14 rounded-panel border border-hairline bg-sunken p-6" aria-labelledby="about-pdf">
       <h2 id="about-pdf" class="m-0 text-h3 font-semibold text-ink">इन PDF के बारे में</h2>
       <ul class="mt-3 flex list-none flex-col gap-2 p-0 text-ui text-body">
@@ -216,5 +236,6 @@ const schema = [
         <li>वेबसाइट बदलने पर PDF भी हर बार नए सिरे से बनती हैं — सामग्री कभी पुरानी नहीं रहती।</li>
       </ul>
     </section>
+    )}
   </div>
 </BaseLayout>

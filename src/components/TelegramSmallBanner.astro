@@ -40,27 +40,30 @@ const CHANNEL_HANDLE = '@HindiGrammarMCQs';
         </svg>
       </div>
 
-      <p class="m-0 text-meta sm:text-ui leading-snug text-body">
-        {topicTitle ? (
-          <>
-            <strong class="font-semibold text-ink">{topicTitle}</strong> और अन्य हिंदी व्याकरण के <span class="font-medium text-[#1378aa] dark:text-[#5bc4f5]">Daily MCQs / Quiz</span> अभ्यास (प्रतियोगी व बोर्ड परीक्षा) के लिए हमारे Telegram चैनल से जुड़ें।
-          </>
-        ) : (
-          <>
-            प्रतियोगी एवं बोर्ड परीक्षाओं के लिए रोज़ाना <span class="font-medium text-[#1378aa] dark:text-[#5bc4f5]">Hindi Grammar Daily MCQs / Quiz</span> अभ्यास हेतु Telegram चैनल से जुड़ें।
-          </>
-        )}
-      </p>
+      <div class="min-w-0">
+        <p class="m-0 text-ui font-semibold leading-snug text-ink">
+          {topicTitle ? (
+            <>Practice <span class="tg-devanagari">{topicTitle}</span> and other grammar topics with daily MCQs on Telegram</>
+          ) : (
+            <>Daily Hindi grammar MCQs on Telegram</>
+          )}
+        </p>
+        <p class="m-0 mt-0.5 text-meta leading-snug text-body">
+          Free quizzes for <mark class="tg-mark">competitive exams</mark> and <mark class="tg-mark">board exams</mark>.
+        </p>
+      </div>
     </div>
 
-    {/* Right: Action Button */}
+    {/* Right: Action Button. The ::after stretches its hit area over the
+        whole card, so a tap anywhere on the banner opens the channel. */}
     <a
       href={TELEGRAM_URL}
       target="_blank"
       rel="noopener noreferrer"
-      class="inline-flex shrink-0 items-center justify-center gap-1.5 self-start sm:self-auto rounded-pill bg-[#229ED9] px-3.5 py-1.5 text-meta font-medium text-white no-underline shadow-xs transition-all hover:bg-[#1d8bc1] hover:shadow active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#229ED9]"
+      aria-label={`Join ${CHANNEL_HANDLE} on Telegram`}
+      class="inline-flex shrink-0 items-center justify-center gap-1.5 self-start sm:self-auto rounded-pill bg-[#229ED9] px-3.5 py-1.5 text-meta font-medium text-white no-underline shadow-xs transition-all after:absolute after:inset-0 after:content-[''] hover:bg-[#1d8bc1] hover:shadow active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#229ED9]"
     >
-      <span>Join Telegram Channel</span>
+      <span>Join on Telegram</span>
       <svg class="size-3.5 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5" viewBox="0 0 16 16" fill="none" aria-hidden="true">
         <path d="M4 12L12 4H6M12 4V10" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
@@ -69,6 +72,31 @@ const CHANNEL_HANDLE = '@HindiGrammarMCQs';
 </aside>
 
 <style>
+  /* The copy is all English, so it takes the system Latin face rather than
+     the Devanagari font's Latin glyphs; only the topic title switches back. */
+  .telegram-small-banner {
+    font-family: ui-sans-serif, system-ui, sans-serif;
+  }
+
+  .tg-devanagari {
+    font-family: var(--font-sans);
+  }
+
+  /* A soft amber highlighter stroke under the lower half of the words: warm
+     against the Telegram blue, so the exam names stand out, but muted enough
+     that the line doesn't read as a sales pitch. */
+  .tg-mark {
+    background: linear-gradient(transparent 55%, rgb(245 176 66 / 0.4) 55%);
+    color: var(--color-ink);
+    font-weight: 600;
+    padding: 0 0.1em;
+    border-radius: 2px;
+  }
+
+  :global([data-theme='dark']) .tg-mark {
+    background: linear-gradient(transparent 55%, rgb(224 176 98 / 0.3) 55%);
+  }
+
   @media print {
     .telegram-small-banner {
       display: none !important;
